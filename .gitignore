@@ -10,3 +10,5 @@
 /web/build/
 /web/out/
 /web/out/production/classes/
+/.idea/
+/gradle/
