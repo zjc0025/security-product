@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zjc.dao.mapper.ProductMapper">
+  <resultMap id="BaseResultMap" type="com.zjc.dao.model.Product">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="code" jdbcType="VARCHAR" property="code" />
+    <result column="product_name" jdbcType="VARCHAR" property="productName" />
+    <result column="sample" jdbcType="INTEGER" property="sample" />
+    <result column="store_inventory" jdbcType="INTEGER" property="storeInventory" />
+    <result column="warehouse" jdbcType="INTEGER" property="warehouse" />
+    <result column="ordered" jdbcType="INTEGER" property="ordered" />
+    <result column="other_place_sample" jdbcType="INTEGER" property="otherPlaceSample" />
+    <result column="amount" jdbcType="DECIMAL" property="amount" />
+    <result column="remark" jdbcType="VARCHAR" property="remark" />
+  </resultMap>
+  <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.zjc.dao.model.Product">
+    <result column="picture" jdbcType="LONGVARBINARY" property="picture" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, code, product_name, sample, store_inventory, warehouse, ordered, other_place_sample, 
+    amount, remark
+  </sql>
+  <sql id="Blob_Column_List">
+    picture
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="ResultMapWithBLOBs">
+    select 
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from product
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from product
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.zjc.dao.model.Product">
+    insert into product (id, code, product_name, 
+      sample, store_inventory, warehouse, 
+      ordered, other_place_sample, amount, 
+      remark, picture)
+    values (#{id,jdbcType=INTEGER}, #{code,jdbcType=VARCHAR}, #{productName,jdbcType=VARCHAR}, 
+      #{sample,jdbcType=INTEGER}, #{storeInventory,jdbcType=INTEGER}, #{warehouse,jdbcType=INTEGER}, 
+      #{ordered,jdbcType=INTEGER}, #{otherPlaceSample,jdbcType=INTEGER}, #{amount,jdbcType=DECIMAL}, 
+      #{remark,jdbcType=VARCHAR}, #{picture,jdbcType=LONGVARBINARY})
+  </insert>
+  <insert id="insertSelective" parameterType="com.zjc.dao.model.Product">
+    insert into product
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="code != null">
+        code,
+      </if>
+      <if test="productName != null">
+        product_name,
+      </if>
+      <if test="sample != null">
+        sample,
+      </if>
+      <if test="storeInventory != null">
+        store_inventory,
+      </if>
+      <if test="warehouse != null">
+        warehouse,
+      </if>
+      <if test="ordered != null">
+        ordered,
+      </if>
+      <if test="otherPlaceSample != null">
+        other_place_sample,
+      </if>
+      <if test="amount != null">
+        amount,
+      </if>
+      <if test="remark != null">
+        remark,
+      </if>
+      <if test="picture != null">
+        picture,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="code != null">
+        #{code,jdbcType=VARCHAR},
+      </if>
+      <if test="productName != null">
+        #{productName,jdbcType=VARCHAR},
+      </if>
+      <if test="sample != null">
+        #{sample,jdbcType=INTEGER},
+      </if>
+      <if test="storeInventory != null">
+        #{storeInventory,jdbcType=INTEGER},
+      </if>
+      <if test="warehouse != null">
+        #{warehouse,jdbcType=INTEGER},
+      </if>
+      <if test="ordered != null">
+        #{ordered,jdbcType=INTEGER},
+      </if>
+      <if test="otherPlaceSample != null">
+        #{otherPlaceSample,jdbcType=INTEGER},
+      </if>
+      <if test="amount != null">
+        #{amount,jdbcType=DECIMAL},
+      </if>
+      <if test="remark != null">
+        #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="picture != null">
+        #{picture,jdbcType=LONGVARBINARY},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.zjc.dao.model.Product">
+    update product
+    <set>
+      <if test="code != null">
+        code = #{code,jdbcType=VARCHAR},
+      </if>
+      <if test="productName != null">
+        product_name = #{productName,jdbcType=VARCHAR},
+      </if>
+      <if test="sample != null">
+        sample = #{sample,jdbcType=INTEGER},
+      </if>
+      <if test="storeInventory != null">
+        store_inventory = #{storeInventory,jdbcType=INTEGER},
+      </if>
+      <if test="warehouse != null">
+        warehouse = #{warehouse,jdbcType=INTEGER},
+      </if>
+      <if test="ordered != null">
+        ordered = #{ordered,jdbcType=INTEGER},
+      </if>
+      <if test="otherPlaceSample != null">
+        other_place_sample = #{otherPlaceSample,jdbcType=INTEGER},
+      </if>
+      <if test="amount != null">
+        amount = #{amount,jdbcType=DECIMAL},
+      </if>
+      <if test="remark != null">
+        remark = #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="picture != null">
+        picture = #{picture,jdbcType=LONGVARBINARY},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.zjc.dao.model.Product">
+    update product
+    set code = #{code,jdbcType=VARCHAR},
+      product_name = #{productName,jdbcType=VARCHAR},
+      sample = #{sample,jdbcType=INTEGER},
+      store_inventory = #{storeInventory,jdbcType=INTEGER},
+      warehouse = #{warehouse,jdbcType=INTEGER},
+      ordered = #{ordered,jdbcType=INTEGER},
+      other_place_sample = #{otherPlaceSample,jdbcType=INTEGER},
+      amount = #{amount,jdbcType=DECIMAL},
+      remark = #{remark,jdbcType=VARCHAR},
+      picture = #{picture,jdbcType=LONGVARBINARY}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.zjc.dao.model.Product">
+    update product
+    set code = #{code,jdbcType=VARCHAR},
+      product_name = #{productName,jdbcType=VARCHAR},
+      sample = #{sample,jdbcType=INTEGER},
+      store_inventory = #{storeInventory,jdbcType=INTEGER},
+      warehouse = #{warehouse,jdbcType=INTEGER},
+      ordered = #{ordered,jdbcType=INTEGER},
+      other_place_sample = #{otherPlaceSample,jdbcType=INTEGER},
+      amount = #{amount,jdbcType=DECIMAL},
+      remark = #{remark,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+
+</mapper>

@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<head>
+    <title>Hello World!</title>
+    <meta name="_csrf" th:content="${_csrf.token}">
+    <meta name="_csrf_header" th:content="${_csrf.headerName}">
+
+    <!-- CSS 部分 -->
+    <!-- Bootstrap 3.3.7 -->
+    <link rel="stylesheet" href="/css/bootstrap.css">
+    <!-- Bootstrap table -->
+    <link rel="stylesheet" href="/vendor/bootstrap-table/dist/bootstrap-table.css">
+    <link rel="stylesheet" href="/css/bootstrap-editable.css">
+    <link rel="stylesheet" href="/css/toastr.css">
+</head>
+<style>
+    .toast-center-center {
+        top: 50%;
+        left: 50%;
+        margin-top: -30px;
+        margin-left: -150px;
+    }
+    table {
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow:ellipsis;
+        table-layout:fixed;
+        word-break:break-all;
+    }
+    .emptyclass{
+        color: #0088cc;
+    }
+    #dataTable td {
+        overflow: hidden;
+         padding-left: 5px!important;
+        padding-right: 0!important;
+    }
+</style>
+
+<body>
+
+<div id="toolbar">
+    <a href="/product/form" class="btn btn-success" data-toggle="modal" id="addBtn" data-target="#myModal">添加</a>
+</div>
+<table id="dataTable" class="table resizable-table"></table>
+
+
+<!-- 模态框（Modal） -->
+<div class="modal fade" id="myModal" role="basic" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+        </div>
+    </div>
+</div>
+
+
+
+
+
+<script src="/vendor/jquery/jquery.min.js"></script>
+<script src="/js/bootstrap.js"></script>
+<script src="/vendor/bootstrap-table/dist/bootstrap-table.js"></script>
+<script src="/vendor/bootstrap-table/dist/locale/bootstrap-table-zh-CN.js"></script>
+<script src="/js/bootstrap-editable.js"></script>
+<script src="/vendor/bootstrap-table/dist/extensions/editable/bootstrap-table-editable.js"></script>
+<script src="/vendor/bootstrap/js/colResizable-1.6.js"></script>
+<script src="/vendor/bootstrap-table/dist/extensions/resizable/bootstrap-table-resizable.js"></script>
+<script src="/js/toastr.js"></script>
+</body>
+</html>
+<script>
+
+    var token = $("meta[name='_csrf']").attr("content");
+    var header = $("meta[name='_csrf_header']").attr("content");
+
+    $(function(){
+        $("#dataTable").colResizable({
+            resizeMode: 'fit',
+            liveDrag: true,
+            draggingClass: 'dragging'
+        });
+    });
+
+    toastr.options = { // toastr配置
+        "closeButton": true, //是否显示关闭按钮
+        "debug": false, //是否使用debug模式
+        "progressBar": true, //是否显示进度条，当为false时候不显示；当为true时候，显示进度条，当进度条缩短到0时候，消息通知弹窗消失
+        "positionClass": "toast-center-center",//显示的动画时间
+        "showDuration": "400", //显示的动画时间
+        "hideDuration": "1000", //消失的动画时间
+        "timeOut": "2500", //展现时间
+        "extendedTimeOut": "1000", //加长展示时间
+        "showEasing": "swing", //显示时的动画缓冲方式
+        "hideEasing": "linear", //消失时的动画缓冲方式
+        "showMethod": "fadeIn", //显示时的动画方式
+        "hideMethod": "fadeOut" //消失时的动画方式
+    };
+
+    $('#dataTable').bootstrapTable({
+        url: '/product/list',        // 表格数据来源
+        method: 'post',
+        striped: true, // 是否显示行间隔色
+        pagination: true, // 是否分页
+        search: true,
+        sortable: true, //是否启用排序
+        // clickToSelect: true,
+        showExport: true,
+        toolbar:'#toolbar',//工具栏
+        toolbarAlign:'left',//工具栏的位置
+        ajaxOptions:{
+            headers: JSON.parse('{"'+header+'": "'+token+'"}')
+        },
+        detailView : true,
+        detailFormatter : function (index, row) {
+            var image = '<div class="photos">'
+                +'<a target="_blank" href="'+row['jumpUrl']+'"><img alt="image" class="feed-photo" src="'+row['pictureBase64']+'"></a>'
+                +'</div>';
+            return image;
+        },
+        columns: [
+            // {checkbox: true},
+            {title: '序号', align: "center", width:'50px',
+                formatter: function (value, row, index) {
+                    return index + 1;
+                }
+            },
+            {field: 'pictureBase64', title: '图片', formatter: function (value, row, index) {
+                console.log(value);
+                    return "<img style='width: 50px;height: 50px;' src='"+value+"' alt=''>"
+                }},
+            {field: 'code', title: '型号', sortable: true, editable: {
+                    type: 'text',
+                    title: '型号',
+                    validate: function (v) {
+                        if (!v) return '型号不能为空';
+                        var flag;
+                        $.ajax({
+                            url: '/product/checkCode', // 请求路径
+                            type: 'get',
+                            async: false,	// 同步请求，必须是false
+                            data:{
+                                code: v // 请求参数
+                            },
+                            success:function(res){
+                                flag = res.valid;
+                            }
+                        });
+                        if(!flag){
+                            return '该型号已存在！';
+                        }
+                    }
+                }},
+            {field: 'productName', title: '品名', sortable: true, editable: {
+                    type: 'text',
+                    title: '品名',
+                    validate: function (v) {
+                        if (!v) return '品名不能为空';
+                    },
+                    emptytext: function () { return '-'; },
+                    emptyclass: 'emptyclass'
+                }},
+            {field: 'sample', title: '出样', sortable: true, editable: {
+                    type: 'text',
+                    title: '出样个数',
+                    validate: function (v) {
+                        if (!v) return '数量不能为空';
+                        var reg = /^([0-9]{1,}[.]*[0-9]*)$/;
+                        if(!reg.test(v)) return '必须是数字';
+                    }
+                }},
+            {field: 'storeInventory', title: '店面库存', sortable: true, editable: {
+                    type: 'text',
+                    title: '店面库存',
+                    validate: function (v) {
+                        if (!v) return '数量不能为空';
+                        var reg = /^([0-9]{1,}[.]*[0-9]*)$/;
+                        if(!reg.test(v)) return '必须是数字';
+                    }
+                }},
+            {field: 'warehouse', title: '仓库', sortable: true, editable: {
+                    type: 'text',
+                    title: '仓库个数',
+                    validate: function (v) {
+                        if (!v) return '数量不能为空';
+                        var reg = /^([0-9]{1,}[.]*[0-9]*)$/;
+                        if(!reg.test(v)) return '必须是数字';
+                    }
+                }},
+            {field: 'ordered', title: '已订出', sortable: true, editable: {
+                    type: 'text',
+                    title: '已订出个数',
+                    validate: function (v) {
+                        if (!v) return '数量不能为空';
+                        var reg = /^([0-9]{1,}[.]*[0-9]*)$/;
+                        if(!reg.test(v)) return '必须是数字';
+                    }
+                }},
+            {field: 'otherPlaceSample', title: '其他地方出样', sortable: true, editable: {
+                    type: 'text',
+                    title: '其他地方出样个数',
+                    validate: function (v) {
+                        if (!v) return '数量不能为空';
+                        var reg = /^([0-9]{1,}[.]*[0-9]*)$/;
+                        if(!reg.test(v)) return '必须是数字';
+                    }
+                }},
+            {field: 'amount', title: '金额', sortable: true, editable: {
+                    type: 'text',
+                    title: '金额',
+                    validate: function (v) {
+                        if (!v) return '金额不能为空';
+                        var reg = /^([0-9]{1,}[.]*[0-9]*)$/;
+                        if(!reg.test(v)) return '金额必须是数字';
+                    }
+                }},
+            {field: 'remark', title: '备注', width: '100px', editable: {
+                    type: 'text',
+                    title: '备注',
+                    emptytext: function () {
+                        return '-';
+                    },
+                    emptyclass: 'emptyclass'
+                }}
+        ],
+        onEditableSave: function (field, row, oldValue, $el) {
+            console.log(row);
+            $.ajax({
+                type: "post",
+                url: "/product/editProduct",
+                data: row,
+                // dataType: 'JSON',
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader(header, token);
+                },
+                success: function (data) {
+                    toastr.success('修改成功');
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    toastr.error(jqXHR.responseJSON.message);
+                },
+                complete: function () {
+
+                }
+            });
+        }
+    });
+
+    //新增按钮
+    $('#addBtn').click(function(){
+
+    });
+
+    //
+</script>

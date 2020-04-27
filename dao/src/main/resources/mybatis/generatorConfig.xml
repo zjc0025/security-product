@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE generatorConfiguration
+        PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN"
+        "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
+
+<generatorConfiguration>
+
+    <!--    <classPathEntry location="src/main/resources/ojdbc6.jar" />-->
+
+    <context id="default" targetRuntime="MyBatis3" defaultModelType="flat">
+
+        <plugin type="org.mybatis.generator.plugins.SerializablePlugin" />
+
+        <commentGenerator>
+            <property name="suppressAllComments" value="true"/>
+            <property name="suppressDate" value="true"/>
+            <property name="javaFileEncoding" value="utf-8"/>
+        </commentGenerator>
+
+        <jdbcConnection driverClass="${driverClass}"
+                        connectionURL="${connectionURL}"
+                        userId="${userId}"
+                        password="${password}">
+        </jdbcConnection>
+
+        <javaTypeResolver >
+            <property name="forceBigDecimals" value="false" />
+        </javaTypeResolver>
+
+        <javaModelGenerator targetPackage="com.zjc.dao.model" targetProject="src/main/java">
+            <property name="enableSubPackages" value="false" />
+            <property name="constructorBased" value="false"/>
+            <property name="immutable" value="false"/>
+            <property name="trimStrings" value="true" />
+        </javaModelGenerator>
+
+        <sqlMapGenerator targetPackage="com.zjc.dao.mapper" targetProject="src/main/resources">
+            <property name="enableSubPackages" value="false" />
+        </sqlMapGenerator>
+
+        <javaClientGenerator type="XMLMAPPER" targetPackage="com.zjc.dao.mapper" targetProject="src/main/java">
+            <property name="enableSubPackages" value="false" />
+        </javaClientGenerator>
+
+
+<!--        <table tableName="USER" domainObjectName="SysUser"-->
+<!--               enableCountByExample="false" enableUpdateByExample="false"-->
+<!--               enableDeleteByExample="false" enableSelectByExample="false"-->
+<!--               selectByExampleQueryId="false" >-->
+<!--        </table>-->
+
+        <table tableName="product" domainObjectName="Product"
+               enableCountByExample="false" enableUpdateByExample="false"
+               enableDeleteByExample="false" enableSelectByExample="false"
+               selectByExampleQueryId="false" >
+        </table>
+
+    </context>
+</generatorConfiguration>

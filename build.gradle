@@ -1,0 +1,28 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '2.1.6.RELEASE'
+}
+
+apply plugin: 'io.spring.dependency-management'  //应用的插件
+
+group 'com.zjc'
+version '1.0-SNAPSHOT'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+}
+
+bootJar {
+    baseName('security-test')
+    version('0.1.0')
+    mainClassName('com.zjc.security.web.Application')
+}
+
+dependencies {
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+//    compile 'org.springframework.boot:spring-boot-starter-web'
+}
+jar.enabled=true
