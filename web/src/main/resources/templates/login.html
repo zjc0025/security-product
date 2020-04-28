@@ -13,13 +13,40 @@
 
   <!-- Custom fonts for this template-->
   <link href="/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
-  <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
+<!--  <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">-->
 
   <!-- Custom styles for this template-->
   <link href="/css/sb-admin-2.min.css" rel="stylesheet">
 
 </head>
+<style>
+  .vcode {
+    width: 310px;
+    margin: 100px auto;
+  }
+  .vcode input {
+    display: block;
+    width: 290px;
+    line-height: 40px;
+    margin: 10px 0;
+    padding: 0 10px;
+    outline: none;
+    border:1px solid #c8cccf;
+    border-radius: 4px;
+    color:#6a6f77;
+  }
+  #msg {
+    width: 100%;
+    line-height: 40px;
+    font-size: 14px;
+    text-align: center;
+  }
+  .vcode a:link,a:visited,a:hover,a:active {
+    margin-left: 100px;
+    color: #0366D6;
+  }
 
+</style>
 <body class="bg-gradient-primary">
 
   <div class="container">
@@ -33,13 +60,13 @@
           <div class="card-body p-0">
             <!-- Nested Row within Card Body -->
             <div class="row">
-              <div class="col-lg-6 d-none d-lg-block bg-login-image"></div>
+              <div class="col-lg-6 d-none d-lg-block"></div>
               <div class="col-lg-6">
                 <div class="p-5">
                   <div class="text-center">
                     <h1 class="h4 text-gray-900 mb-4">欢迎回来!</h1>
                   </div>
-                  <form class="user" th:action="@{/login}" method="post">
+                  <form class="user" th:action="@{/login}" method="post" onsubmit="return vcodeValidate()">
                     <div class="form-group">
                       <input name="username" type="text" class="form-control form-control-user" id="exampleInputEmail" placeholder="请输入账号">
                     </div>
@@ -52,9 +79,16 @@
                         <label class="custom-control-label" for="customCheck">记住我</label>
                       </div>
                     </div>
-<!--                    <a href="index.html" class="btn btn-primary btn-user btn-block">-->
-<!--                      Login-->
-<!--                    </a>-->
+
+                    <!-- 图片验证码开始 -->
+                    <div class="vcode">
+<!--                      <input value="admin" readonly/>-->
+<!--                      <input type="password" value="1234567890" readonly/>-->
+                      <div id="captcha"></div>
+                      <div id="msg"></div>
+                    </div>
+                    <!-- 图片验证码结束 -->
+
                     <input type="submit" class="btn btn-primary btn-user btn-block" value="登录"/>
 
 <!--                    <a href="index.html" class="btn btn-google btn-user btn-block">-->
@@ -92,7 +126,33 @@
 
   <!-- Custom scripts for all pages-->
   <script src="/js/sb-admin-2.min.js"></script>
-
+  <script src="/js/jigsaw.min.js"></script>
 </body>
 
 </html>
+<script>
+
+    //图片验证是否正确
+    var vcodeStatus = false;
+
+    jigsaw.init({
+        el: document.getElementById('captcha'),
+        onSuccess: function () {
+            vcodeStatus = true;
+            document.getElementById('msg').innerHTML = '验证成功！'
+        },
+        onFail: function () {
+            vcodeStatus = false;
+            document.getElementById('msg').innerHTML = '请将拼图移动到正确位置！'
+        },
+        onRefresh: cleanMsg
+    });
+
+    function cleanMsg() {
+        document.getElementById('msg').innerHTML = ''
+    }
+
+    function vcodeValidate() {
+        return vcodeStatus;
+    }
+</script>
