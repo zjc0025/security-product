@@ -3,156 +3,213 @@
 
 <head>
 
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <meta name="description" content="">
-  <meta name="author" content="">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
 
-  <title>SB Admin 2 - Login</title>
+    <title>SB Admin 2 - Login</title>
 
-  <!-- Custom fonts for this template-->
-  <link href="/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
-<!--  <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">-->
+    <!-- Custom fonts for this template-->
+    <link href="/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+    <!--  <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">-->
 
-  <!-- Custom styles for this template-->
-  <link href="/css/sb-admin-2.min.css" rel="stylesheet">
-
+    <!-- Custom styles for this template-->
+    <link href="/css/sb-admin-2.min.css" rel="stylesheet">
+    <link href="/css/vcode-style.css" rel="stylesheet">
+    <link rel="stylesheet" href="/css/toastr.css">
 </head>
 <style>
-  .vcode {
-    width: 310px;
-    margin: 100px auto;
-  }
-  .vcode input {
-    display: block;
-    width: 290px;
-    line-height: 40px;
-    margin: 10px 0;
-    padding: 0 10px;
-    outline: none;
-    border:1px solid #c8cccf;
-    border-radius: 4px;
-    color:#6a6f77;
-  }
-  #msg {
-    width: 100%;
-    line-height: 40px;
-    font-size: 14px;
-    text-align: center;
-  }
-  .vcode a:link,a:visited,a:hover,a:active {
-    margin-left: 100px;
-    color: #0366D6;
-  }
+    .toast-center-center {
+        top: 50%;
+        left: 50%;
+        margin-top: -30px;
+        margin-left: -150px;
+    }
+    .vcode {
+        width: 310px;
+        margin-bottom: 10px;
+        margin-left: 18px;
+    }
+    .vcode input {
+        display: block;
+        width: 290px;
+        line-height: 40px;
+        margin: 10px 0;
+        padding: 0 10px;
+        outline: none;
+        border:1px solid #c8cccf;
+        border-radius: 4px;
+        color:#6a6f77;
+    }
+    #msg {
+        width: 100%;
+        line-height: 40px;
+        font-size: 14px;
+        text-align: center;
+    }
+    .vcode a:link,.vcode a:visited,.vcode a:hover,.vcode a:active {
+        margin-left: 100px;
+        color: #0366D6;
+    }
 
 </style>
 <body class="bg-gradient-primary">
 
-  <div class="container">
+<div class="container">
 
     <!-- Outer Row -->
     <div class="row justify-content-center">
 
-      <div class="col-xl-10 col-lg-12 col-md-9">
+        <div class="col-xl-10 col-lg-12 col-md-9">
 
-        <div class="card o-hidden border-0 shadow-lg my-5">
-          <div class="card-body p-0">
-            <!-- Nested Row within Card Body -->
-            <div class="row">
-              <div class="col-lg-6 d-none d-lg-block"></div>
-              <div class="col-lg-6">
-                <div class="p-5">
-                  <div class="text-center">
-                    <h1 class="h4 text-gray-900 mb-4">欢迎回来!</h1>
-                  </div>
-                  <form class="user" th:action="@{/login}" method="post" onsubmit="return vcodeValidate()">
-                    <div class="form-group">
-                      <input name="username" type="text" class="form-control form-control-user" id="exampleInputEmail" placeholder="请输入账号">
-                    </div>
-                    <div class="form-group">
-                      <input name="password" type="password" class="form-control form-control-user" id="exampleInputPassword" placeholder="请输入密码">
-                    </div>
-                    <div class="form-group">
-                      <div class="custom-control custom-checkbox small">
-                        <input type="checkbox" class="custom-control-input" id="customCheck">
-                        <label class="custom-control-label" for="customCheck">记住我</label>
-                      </div>
-                    </div>
+            <div class="card o-hidden border-0 shadow-lg my-5">
+                <div class="card-body p-0">
+                    <!-- Nested Row within Card Body -->
+                    <div class="row">
+                        <div class="col-lg-6 d-none d-lg-block"></div>
+                        <div class="col-lg-6">
+                            <div class="p-5">
+                                <div class="text-center">
+                                    <h1 class="h4 text-gray-900 mb-4">欢迎回来!</h1>
+                                </div>
+                                <form class="user" th:action="@{/login}" method="post" onsubmit="return vcodeValidate()">
+                                    <div class="form-group">
+                                        <input name="username" type="text" class="form-control form-control-user" id="exampleInputEmail" placeholder="请输入账号">
+                                    </div>
+                                    <div class="form-group">
+                                        <input name="password" type="password" class="form-control form-control-user" id="exampleInputPassword" placeholder="请输入密码">
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="custom-control custom-checkbox small">
+                                            <input name="remember-me" type="checkbox" class="custom-control-input" id="customCheck">
+                                            <label class="custom-control-label" for="customCheck">记住我（一天内免登陆）</label>
+                                        </div>
+                                    </div>
 
-                    <!-- 图片验证码开始 -->
-                    <div class="vcode">
-<!--                      <input value="admin" readonly/>-->
-<!--                      <input type="password" value="1234567890" readonly/>-->
-                      <div id="captcha"></div>
-                      <div id="msg"></div>
+                                    <!-- 图片验证码开始 -->
+                                    <!--                    <div class="vcode">-->
+                                    <!--                      <div id="captcha"></div>-->
+                                    <!--                      <div id="msg"></div>-->
+                                    <!--                    </div>-->
+                                    <!-- 图片验证码结束 -->
+
+                                    <!-- 图片验证码开始 -->
+                                    <div id="slideBar" style="margin-bottom: 15px; margin-left: 28px"></div>
+                                    <!-- 图片验证码结束 -->
+
+
+                                    <input type="submit" class="btn btn-primary btn-user btn-block" value="登录"/>
+
+                                    <!--                    <a href="index.html" class="btn btn-google btn-user btn-block">-->
+                                    <!--                      <i class="fab fa-google fa-fw"></i> Login with Google-->
+                                    <!--                    </a>-->
+                                    <!--                    <a href="index.html" class="btn btn-facebook btn-user btn-block">-->
+                                    <!--                      <i class="fab fa-facebook-f fa-fw"></i> Login with Facebook-->
+                                    <!--                    </a>-->
+                                </form>
+                                <hr>
+                                <div class="text-center">
+                                    <a  class="small" href="forgot-password.html">忘记密码?</a>
+                                </div>
+                                <div class="text-center">
+                                    <a  class="small" href="register.html">注册账号</a>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <!-- 图片验证码结束 -->
-
-                    <input type="submit" class="btn btn-primary btn-user btn-block" value="登录"/>
-
-<!--                    <a href="index.html" class="btn btn-google btn-user btn-block">-->
-<!--                      <i class="fab fa-google fa-fw"></i> Login with Google-->
-<!--                    </a>-->
-<!--                    <a href="index.html" class="btn btn-facebook btn-user btn-block">-->
-<!--                      <i class="fab fa-facebook-f fa-fw"></i> Login with Facebook-->
-<!--                    </a>-->
-                  </form>
-                  <hr>
-                  <div class="text-center">
-                    <a class="small" href="forgot-password.html">忘记密码?</a>
-                  </div>
-                  <div class="text-center">
-                    <a class="small" href="register.html">注册账号</a>
-                  </div>
                 </div>
-              </div>
             </div>
-          </div>
-        </div>
 
-      </div>
+        </div>
 
     </div>
 
-  </div>
+</div>
 
-  <!-- Bootstrap core JavaScript-->
-  <script src="/vendor/jquery/jquery.min.js"></script>
-  <script src="/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+<!-- Bootstrap core JavaScript-->
+<script src="/vendor/jquery/jquery.min.js"></script>
+<script src="/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 
-  <!-- Core plugin JavaScript-->
-  <script src="/vendor/jquery-easing/jquery.easing.min.js"></script>
+<!-- Core plugin JavaScript-->
+<script src="/vendor/jquery-easing/jquery.easing.min.js"></script>
 
-  <!-- Custom scripts for all pages-->
-  <script src="/js/sb-admin-2.min.js"></script>
-  <script src="/js/jigsaw.min.js"></script>
+<!-- Custom scripts for all pages-->
+<script src="/js/sb-admin-2.min.js"></script>
+<script src="/js/jigsaw.min.js"></script>
+<script src="/js/vcode-style.js"></script>
+<script src="/js/toastr.js"></script>
 </body>
 
 </html>
 <script>
 
+    toastr.options = { // toastr配置
+        "closeButton": true, //是否显示关闭按钮
+        "debug": false, //是否使用debug模式
+        "progressBar": true, //是否显示进度条，当为false时候不显示；当为true时候，显示进度条，当进度条缩短到0时候，消息通知弹窗消失
+        "positionClass": "toast-center-center",//显示的动画时间
+        "showDuration": "400", //显示的动画时间
+        "hideDuration": "1000", //消失的动画时间
+        "timeOut": "2500", //展现时间
+        "extendedTimeOut": "1000", //加长展示时间
+        "showEasing": "swing", //显示时的动画缓冲方式
+        "hideEasing": "linear", //消失时的动画缓冲方式
+        "showMethod": "fadeIn", //显示时的动画方式
+        "hideMethod": "fadeOut" //消失时的动画方式
+    };
+
     //图片验证是否正确
     var vcodeStatus = false;
 
-    jigsaw.init({
-        el: document.getElementById('captcha'),
-        onSuccess: function () {
-            vcodeStatus = true;
-            document.getElementById('msg').innerHTML = '验证成功！'
-        },
-        onFail: function () {
-            vcodeStatus = false;
-            document.getElementById('msg').innerHTML = '请将拼图移动到正确位置！'
-        },
-        onRefresh: cleanMsg
-    });
+    var loginError = '[[${errorMsg}]]';
+    console.log(loginError);
 
-    function cleanMsg() {
-        document.getElementById('msg').innerHTML = ''
+    if('' != loginError){
+        toastr.error(loginError);
     }
+
+    // jigsaw.init({
+    //     el: document.getElementById('captcha'),
+    //     onSuccess: function () {
+    //         vcodeStatus = true;
+    //         $("#msg").html('验证成功！');
+    //     },
+    //     onFail: function () {
+    //         vcodeStatus = false;
+    //         $("#msg").html('请将拼图移动到正确位置！');
+    //     },
+    //     onRefresh: function () {
+    //         $("#msg").html('');
+    //     }
+    // });
+    //
+    // function vcodeValidate() {
+    //     if(!vcodeStatus){
+    //         $("#msg").html('请将拼图移动到正确位置！');
+    //     }
+    //     return vcodeStatus;
+    // }
 
     function vcodeValidate() {
+        if(!vcodeStatus){
+            toastr.error('请将拼图移动到正确位置！');
+        }
         return vcodeStatus;
     }
+
+
+    var dataList = ["0","1"];
+    var options = {
+        dataList: dataList,
+        success:function(){
+            vcodeStatus = true;
+        },
+        fail: function(){
+            vcodeStatus = false;
+        }
+    };
+    SliderBar("slideBar", options);
+
 </script>

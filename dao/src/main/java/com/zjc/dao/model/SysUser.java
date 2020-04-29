@@ -1,6 +1,7 @@
 package com.zjc.dao.model;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 public class SysUser implements Serializable {
     /**
@@ -307,4 +308,40 @@ public class SysUser implements Serializable {
     public void setAccountnonlocked(Boolean accountnonlocked) {
         this.accountnonlocked = accountnonlocked;
     }
+
+//    @Override
+//    public boolean equals(Object o) {
+//        if (this == o) return true;
+//        if (o == null || getClass() != o.getClass()) return false;
+//        SysUser sysUser = (SysUser) o;
+//        return Objects.equals(id, sysUser.id) &&
+//                Objects.equals(username, sysUser.username) &&
+//                Objects.equals(password, sysUser.password) &&
+//                Objects.equals(nickname, sysUser.nickname) &&
+//                Objects.equals(roles, sysUser.roles) &&
+//                Objects.equals(enabled, sysUser.enabled) &&
+//                Objects.equals(accountnonexpired, sysUser.accountnonexpired) &&
+//                Objects.equals(credentialsnonexpired, sysUser.credentialsnonexpired) &&
+//                Objects.equals(accountnonlocked, sysUser.accountnonlocked);
+//    }
+//
+//    @Override
+//    public int hashCode() {
+//        return Objects.hash(id, username, password, nickname, roles, enabled, accountnonexpired, credentialsnonexpired, accountnonlocked);
+//    }
+//
+//    @Override
+//    public String toString() {
+//        return "SysUser{" +
+//                "id=" + id +
+//                ", username='" + username + '\'' +
+//                ", password='" + password + '\'' +
+//                ", nickname='" + nickname + '\'' +
+//                ", roles='" + roles + '\'' +
+//                ", enabled=" + enabled +
+//                ", accountnonexpired=" + accountnonexpired +
+//                ", credentialsnonexpired=" + credentialsnonexpired +
+//                ", accountnonlocked=" + accountnonlocked +
+//                '}';
+//    }
 }
