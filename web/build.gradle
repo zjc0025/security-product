@@ -33,6 +33,7 @@ dependencies {
     compile 'mysql:mysql-connector-java:8.0.11'
     compile 'oracle:ojdbc6:11.2.0.3'
     compile 'org.projectlombok:lombok'
+    compile("com.alibaba:fastjson:1.2.56")
     annotationProcessor 'org.projectlombok:lombok'
 }
 

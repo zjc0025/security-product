@@ -4,14 +4,16 @@ import com.zjc.security.web.service.MyUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.core.session.SessionRegistry;
+import org.springframework.security.core.session.SessionRegistryImpl;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
+import org.springframework.security.web.authentication.session.ConcurrentSessionControlAuthenticationStrategy;
 
 import javax.sql.DataSource;
 
@@ -31,20 +33,29 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     MyUserDetailsService myUserDetailsService;
 
+    /**
+     * 自定义用户密码校验过滤器
+     */
+    private final MyAuthenticationProcessingFilter myAuthenticationProcessingFilter;
+
+    public WebSecurityConfig(MyAuthenticationProcessingFilter myAuthenticationProcessingFilter) {
+        this.myAuthenticationProcessingFilter = myAuthenticationProcessingFilter;
+    }
+
     @Override
     protected void configure(HttpSecurity http) throws Exception {
 
         //设置用户登录单机的最大数和错误页面
-        http.sessionManagement().maximumSessions(1).expiredUrl("/timeout");
+//        http.sessionManagement().maximumSessions(1).expiredUrl("/timeout");
 
         http
                 .authorizeRequests()
-                .antMatchers( "/home","/css/**","/img/**","/js/**","/scss/**","/vendor/**","/**/*.png","/**/*.jpg").permitAll()
+                .antMatchers( "/loginFail","/home","/css/**","/img/**","/js/**","/scss/**","/vendor/**","/**/*.png","/**/*.jpg").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .formLogin()
                 .loginPage("/login")
-                .failureUrl("/loginFail")
+//                .failureUrl("/loginFail")
                 .permitAll()
                 .and()
                 .logout()
@@ -58,6 +69,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         //允许iframe
         http.headers().frameOptions().disable();
 
+        // 自定义过滤器认证用户名密码
+        http.addFilterAt(myAuthenticationProcessingFilter, UsernamePasswordAuthenticationFilter.class);
     }
 
 //    @Autowired
@@ -70,12 +83,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 //                .roles("USER");
 //    }
 
-    @Override
-    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth
-                .userDetailsService(myUserDetailsService)
-                .passwordEncoder(new BCryptPasswordEncoder());
-    }
+//    @Override
+//    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+//        auth
+//                .userDetailsService(myUserDetailsService)
+//                .passwordEncoder(new BCryptPasswordEncoder());
+//    }
 
     /**
      * 持久化token
@@ -89,6 +102,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         tokenRepository.setDataSource(dataSource); // 设置数据源
 //        tokenRepository.setCreateTableOnStartup(true); // 启动创建表，创建成功后注释掉
         return tokenRepository;
+    }
+
+    public static void main(String[] args) {
+        System.out.println(new BCryptPasswordEncoder().encode("111") );
+
     }
 
 }

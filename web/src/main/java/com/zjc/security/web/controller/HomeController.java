@@ -2,7 +2,11 @@ package com.zjc.security.web.controller;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
+
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 
 /**
  * @ClassName HelloController
@@ -23,9 +27,16 @@ public class HomeController {
         return "timeout";
     }
 
+    @GetMapping("/login")
+    public String login() {
+        return "login";
+    }
+
     @GetMapping("/loginFail")
-    public String loginFail(Model model){
-        model.addAttribute("errorMsg", "帐号或密码错误！");
+    public String loginFail(String msg, Model model) throws UnsupportedEncodingException {
+        if(!StringUtils.isEmpty(msg)){
+            model.addAttribute("errorMsg", URLDecoder.decode(msg,"utf-8"));
+        }
         return "login";
     }
 
