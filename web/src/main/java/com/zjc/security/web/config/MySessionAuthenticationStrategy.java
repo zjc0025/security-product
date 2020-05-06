@@ -1,21 +1,21 @@
 package com.zjc.security.web.config;
 
 import com.zjc.dao.model.SecurityUser;
-import com.zjc.dao.model.SysUser;
 import org.springframework.context.MessageSource;
 import org.springframework.context.support.MessageSourceAccessor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.SpringSecurityMessageSource;
 import org.springframework.security.core.session.SessionInformation;
 import org.springframework.security.core.session.SessionRegistry;
+import org.springframework.security.core.session.SessionRegistryImpl;
 import org.springframework.security.web.authentication.session.SessionAuthenticationException;
 import org.springframework.security.web.authentication.session.SessionAuthenticationStrategy;
+import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import java.io.IOException;
 import java.util.List;
 
 /**
@@ -24,10 +24,11 @@ import java.util.List;
  * @Author ZJC
  * @Date 2020/4/30 13:07
  */
+@Component
 public class MySessionAuthenticationStrategy implements SessionAuthenticationStrategy {
 
     protected MessageSourceAccessor messages = SpringSecurityMessageSource.getAccessor();
-    private final SessionRegistry sessionRegistry;
+    private final SessionRegistry sessionRegistry = new SessionRegistryImpl();
     private boolean exceptionIfMaximumExceeded = false;
     private int maximumSessions = 1;
 
@@ -35,9 +36,13 @@ public class MySessionAuthenticationStrategy implements SessionAuthenticationStr
      * @param sessionRegistry the session registry which should be updated when the
      * authenticated session is changed.
      */
-    public MySessionAuthenticationStrategy(SessionRegistry sessionRegistry) {
-        Assert.notNull(sessionRegistry, "The sessionRegistry cannot be null");
-        this.sessionRegistry = sessionRegistry;
+//    public MySessionAuthenticationStrategy(SessionRegistry sessionRegistry) {
+//        Assert.notNull(sessionRegistry, "The sessionRegistry cannot be null");
+//        this.sessionRegistry = sessionRegistry;
+//    }
+
+    public SessionRegistry getSessionRegistry() {
+        return this.sessionRegistry;
     }
 
     /**
@@ -132,9 +137,9 @@ public class MySessionAuthenticationStrategy implements SessionAuthenticationStr
                     "Maximum sessions of {0} for this principal exceeded"));
         }
 
-        if(allowableSessions >= maximumSessions){
-            throw new SessionAuthenticationException("当前用户已在其他地方登陆！");
-        }
+//        if(allowableSessions >= maximumSessions){
+//            throw new SessionAuthenticationException("当前用户已在其他地方登陆！");
+//        }
 
         // Determine least recently used session, and mark it for invalidation
         SessionInformation leastRecentlyUsed = null;

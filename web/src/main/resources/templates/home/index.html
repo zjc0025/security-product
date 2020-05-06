@@ -695,4 +695,21 @@
   $('#productTable').click(function () {
     $('#mainPage').attr('src','/product/add');
   })
+
+  // window.onbeforeunload=function(e){
+  //   //获取事件鼠标的位置
+  //   var n = window.event.screenX - window.screenLeft;
+  //   //获取浏览器界面可活动的窗口宽度（50是右上角关闭按钮的宽度）
+  //   var b = n > document.documentElement.scrollWidth-50;
+  //   //window.event.clientY表示事件的y值（鼠标）
+  //   //window.event.altKey表示是否按下列alt键（alt+F4）
+  //   if(b && window.event.clientY < 0 || window.event.altKey)
+  //   {
+  //     alert("是关闭而非刷新");
+  //     window.event.returnValue ="是否要离开此页面？";
+  //   }else{
+  //     alert("是刷新而非关闭");
+  //   }
+  // }
+
 </script>
