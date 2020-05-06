@@ -13,49 +13,104 @@
     <link rel="stylesheet" href="/vendor/bootstrap-table/dist/bootstrap-table.css">
     <link rel="stylesheet" href="/css/bootstrap-editable.css">
     <link rel="stylesheet" href="/css/toastr.css">
+    <link rel="stylesheet" href="/css/bootstrapValidator.css">
+    <link rel="stylesheet" href="/vendor/fileinput/fileinput.css">
+    <link rel="stylesheet" href="/vendor/fileinput/theme.css">
+
 </head>
 <style>
-    .toast-center-center {
-        top: 50%;
-        left: 50%;
-        margin-top: -30px;
-        margin-left: -150px;
-    }
-    table {
-        overflow: hidden;
-        white-space: nowrap;
-        text-overflow:ellipsis;
-        table-layout:fixed;
-        word-break:break-all;
-    }
-    .emptyclass{
-        color: #0088cc;
-    }
-    #dataTable td {
-        overflow: hidden;
-         padding-left: 5px!important;
-        padding-right: 0!important;
+    form .btn{
+        width: 100px;
     }
 </style>
-
 <body>
 
-<div id="toolbar">
-    <a href="/product/form" class="btn btn-success" data-toggle="modal" id="addBtn" data-target="#myModal">添加</a>
+<div class="modal-header">
+<h4 class="modal-title">添加产品</h4>
 </div>
-<table id="dataTable" class="table resizable-table"></table>
-
-
-<!-- 模态框（Modal） -->
-<div class="modal fade" id="myModal" role="basic" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
+<div style="margin: 20px">
+    <form class="form-horizontal" role="form" id="productForm">
+        <div class="form-group">
+            <label for="code" class="col-sm-2 control-label">型号</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control" id="code" name="code"
+                       placeholder="请输入型号">
+            </div>
         </div>
-    </div>
+        <div class="form-group">
+            <label for="productName" class="col-sm-2 control-label">产品名</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control" id="productName" name="productName"
+                       placeholder="请输入产品名">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="sample" class="col-sm-2 control-label">出样</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control" id="sample" name="sample"
+                       placeholder="请输入出样">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="storeInventory" class="col-sm-2 control-label">店面库存</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control" id="storeInventory" name="storeInventory"
+                       placeholder="请输入店面库存">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="warehouse" class="col-sm-2 control-label">仓库</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control" id="warehouse" name="warehouse"
+                       placeholder="请输入仓库">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="ordered" class="col-sm-2 control-label">已订出</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control" id="ordered" name="ordered"
+                       placeholder="请输入已订出数量">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="otherPlaceSample" class="col-sm-2 control-label">其他地方出样</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control" id="otherPlaceSample" name="otherPlaceSample"
+                       placeholder="请输入其他地方出样数量">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="amount" class="col-sm-2 control-label">金额</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control" id="amount" name="amount"
+                       placeholder="请输入金额">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="remark" class="col-sm-2 control-label">备注</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control" id="remark" name="remark"
+                       placeholder="请输入备注">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="picture" class="col-sm-2 control-label">图片</label>
+            <div class="col-sm-10">
+                <input type="file" class="form-control" id="picture" name="picture"
+                       placeholder="请选择图片">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-sm-offset-1 col-sm-10">
+                <button class="btn btn-success" onclick="save()">确定</button>
+                <button style="float: right" class="btn btn-danger" onclick="cancel()">取消</button>
+            </div>
+        </div>
+
+    </form>
 </div>
-
-
-
 
 
 <script src="/vendor/jquery/jquery.min.js"></script>
@@ -67,6 +122,12 @@
 <script src="/vendor/bootstrap/js/colResizable-1.6.js"></script>
 <script src="/vendor/bootstrap-table/dist/extensions/resizable/bootstrap-table-resizable.js"></script>
 <script src="/js/toastr.js"></script>
+<script src="/js/bootstrapValidator.js"></script>
+<script src="/js/zh_CN.js"></script>
+<script src="/vendor/fileinput/fileinput.js"></script>
+<script src="/vendor/fileinput/zh.js"></script>
+<script src="/vendor/fileinput/theme.js"></script>
+<script src="/vendor/fileinput/fa-theme.js"></script>
 </body>
 </html>
 <script>
@@ -74,19 +135,11 @@
     var token = $("meta[name='_csrf']").attr("content");
     var header = $("meta[name='_csrf_header']").attr("content");
 
-    $(function(){
-        $("#dataTable").colResizable({
-            resizeMode: 'fit',
-            liveDrag: true,
-            draggingClass: 'dragging'
-        });
-    });
-
     toastr.options = { // toastr配置
         "closeButton": true, //是否显示关闭按钮
         "debug": false, //是否使用debug模式
         "progressBar": true, //是否显示进度条，当为false时候不显示；当为true时候，显示进度条，当进度条缩短到0时候，消息通知弹窗消失
-        "positionClass": "toast-center-center",//显示的动画时间
+        // "positionClass": "toast-top-center",//显示的动画时间
         "showDuration": "400", //显示的动画时间
         "hideDuration": "1000", //消失的动画时间
         "timeOut": "2500", //展现时间
@@ -97,159 +150,214 @@
         "hideMethod": "fadeOut" //消失时的动画方式
     };
 
-    $('#dataTable').bootstrapTable({
-        url: '/product/list',        // 表格数据来源
-        method: 'post',
-        striped: true, // 是否显示行间隔色
-        pagination: true, // 是否分页
-        search: true,
-        sortable: true, //是否启用排序
-        // clickToSelect: true,
-        showExport: true,
-        toolbar:'#toolbar',//工具栏
-        toolbarAlign:'left',//工具栏的位置
-        ajaxOptions:{
-            headers: JSON.parse('{"'+header+'": "'+token+'"}')
-        },
-        detailView : true,
-        detailFormatter : function (index, row) {
-            var image = '<div class="photos">'
-                +'<a target="_blank" href="'+row['jumpUrl']+'"><img alt="image" class="feed-photo" src="'+row['pictureBase64']+'"></a>'
-                +'</div>';
-            return image;
-        },
-        columns: [
-            // {checkbox: true},
-            {title: '序号', align: "center", width:'50px',
-                formatter: function (value, row, index) {
-                    return index + 1;
-                }
+    $(function () {
+       formValidate();
+    });
+
+    function formValidate(){
+        $('#productForm').bootstrapValidator({
+            message: 'This value is not valid',
+            //提供输入验证图标提示
+            feedbackIcons: {
+                valid: 'glyphicon glyphicon-ok',
+                invalid: 'glyphicon glyphicon-remove',
+                validating: 'glyphicon glyphicon-refresh'
             },
-            {field: 'pictureBase64', title: '图片', formatter: function (value, row, index) {
-                console.log(value);
-                    return "<img style='width: 50px;height: 50px;' src='"+value+"' alt=''>"
-                }},
-            {field: 'code', title: '型号', sortable: true, editable: {
-                    type: 'text',
-                    title: '型号',
-                    validate: function (v) {
-                        if (!v) return '型号不能为空';
-                        var flag;
-                        $.ajax({
-                            url: '/product/checkCode', // 请求路径
-                            type: 'get',
-                            async: false,	// 同步请求，必须是false
-                            data:{
-                                code: v // 请求参数
-                            },
-                            success:function(res){
-                                flag = res.valid;
+            fields: {
+                code: {
+                    message: '产品型号验证失败',
+                    validators: {
+                        notEmpty: {
+                            message: '产品型号不能为空'
+                        },
+                        stringLength: {
+                            min: 1,
+                            max: 120,
+                            message: '产品型号长度必须在1到120之间'
+                        },
+                        threshold: 1, //设置1字符以上开始请求服务器
+                        //有待验证，备注以备下次使用。
+                        //bootstrap的remote验证器需要的返回结果一定是json格式的数据 :
+                        //{"valid":false} //表示不合法，验证不通过
+                        //{"valid":true} //表示合法，验证通过
+                        // remote: {//发起Ajax请求。
+                        //     url: '/product/checkCode',//验证地址
+                        //     data: {code: $('input[name="code"]').val()},
+                        //     message: '该型号产品存在',//提示消息
+                        //     delay: 1000,//设置1秒发起名字验证
+                        //     type: 'get' //请求方式
+                        // }
+                        callback:{
+                            message:"该型号产品存在",
+                            callback:function (value,validator) {
+                                var flag = false;
+                                $.ajax({
+                                    url: '/product/checkCode', // 请求路径
+                                    type: 'get',
+                                    async: false,	// 同步请求，必须是false
+                                    data:{
+                                        code: $('input[name="code"]').val() // 请求参数
+                                    },
+                                    success:function(res){
+                                        flag = res.valid;
+                                    }
+                                });
+                                return flag;
                             }
-                        });
-                        if(!flag){
-                            return '该型号已存在！';
                         }
                     }
-                }},
-            {field: 'productName', title: '品名', sortable: true, editable: {
-                    type: 'text',
-                    title: '品名',
-                    validate: function (v) {
-                        if (!v) return '品名不能为空';
-                    },
-                    emptytext: function () { return '-'; },
-                    emptyclass: 'emptyclass'
-                }},
-            {field: 'sample', title: '出样', sortable: true, editable: {
-                    type: 'text',
-                    title: '出样个数',
-                    validate: function (v) {
-                        if (!v) return '数量不能为空';
-                        var reg = /^([0-9]{1,}[.]*[0-9]*)$/;
-                        if(!reg.test(v)) return '必须是数字';
-                    }
-                }},
-            {field: 'storeInventory', title: '店面库存', sortable: true, editable: {
-                    type: 'text',
-                    title: '店面库存',
-                    validate: function (v) {
-                        if (!v) return '数量不能为空';
-                        var reg = /^([0-9]{1,}[.]*[0-9]*)$/;
-                        if(!reg.test(v)) return '必须是数字';
-                    }
-                }},
-            {field: 'warehouse', title: '仓库', sortable: true, editable: {
-                    type: 'text',
-                    title: '仓库个数',
-                    validate: function (v) {
-                        if (!v) return '数量不能为空';
-                        var reg = /^([0-9]{1,}[.]*[0-9]*)$/;
-                        if(!reg.test(v)) return '必须是数字';
-                    }
-                }},
-            {field: 'ordered', title: '已订出', sortable: true, editable: {
-                    type: 'text',
-                    title: '已订出个数',
-                    validate: function (v) {
-                        if (!v) return '数量不能为空';
-                        var reg = /^([0-9]{1,}[.]*[0-9]*)$/;
-                        if(!reg.test(v)) return '必须是数字';
-                    }
-                }},
-            {field: 'otherPlaceSample', title: '其他地方出样', sortable: true, editable: {
-                    type: 'text',
-                    title: '其他地方出样个数',
-                    validate: function (v) {
-                        if (!v) return '数量不能为空';
-                        var reg = /^([0-9]{1,}[.]*[0-9]*)$/;
-                        if(!reg.test(v)) return '必须是数字';
-                    }
-                }},
-            {field: 'amount', title: '金额', sortable: true, editable: {
-                    type: 'text',
-                    title: '金额',
-                    validate: function (v) {
-                        if (!v) return '金额不能为空';
-                        var reg = /^([0-9]{1,}[.]*[0-9]*)$/;
-                        if(!reg.test(v)) return '金额必须是数字';
-                    }
-                }},
-            {field: 'remark', title: '备注', width: '100px', editable: {
-                    type: 'text',
-                    title: '备注',
-                    emptytext: function () {
-                        return '-';
-                    },
-                    emptyclass: 'emptyclass'
-                }}
-        ],
-        onEditableSave: function (field, row, oldValue, $el) {
-            console.log(row);
-            $.ajax({
-                type: "post",
-                url: "/product/editProduct",
-                data: row,
-                // dataType: 'JSON',
-                beforeSend: function (xhr) {
-                    xhr.setRequestHeader(header, token);
                 },
-                success: function (data) {
-                    toastr.success('修改成功');
-                },
-                error: function (jqXHR, textStatus, errorThrown) {
-                    toastr.error(jqXHR.responseJSON.message);
-                },
-                complete: function () {
-
+                productName: {
+                    message: '品名验证失败',
+                    validators: {
+                        notEmpty: {
+                            message: '品名不能为空'
+                        },
+                        stringLength: {
+                            min: 1,
+                            max: 120,
+                            message: '品名长度必须在1到120之间'
+                        }
+                    }
                 }
-            });
+            }
+        });
+    }
+
+
+    function save() {
+        var bootstrapValidator = $("#productForm").data('bootstrapValidator');
+        bootstrapValidator.validate();
+        if(!bootstrapValidator.isValid()){
+            return;
+        }
+        $.ajax({
+            url: "/product/addProduct"
+            , type: "post"
+            , async: false
+            , beforeSend: function (xhr) {
+                xhr.setRequestHeader(header, token);
+            },
+            data: {
+                code: $('#code').val()
+                ,productName: $('#productName').val()
+                ,sample: $('#sample').val()
+                ,storeInventory: $('#storeInventory').val()
+                ,warehouse: $('#warehouse').val()
+                ,ordered: $('#ordered').val()
+                ,otherPlaceSample: $('#otherPlaceSample').val()
+                ,amount: $('#amount').val()
+                ,remark: $('#remark').val()
+                ,picture: dataURL
+            },
+            success: function(){
+                // toastr.success('添加成功！');
+                alert('添加成功');
+                // $('#myModal').modal('hide');
+                window.location.reload();
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                // toastr.error(jqXHR.responseJSON.message);
+                alert('添加失败！' + jqXHR.responseJSON.message);
+                // $('#myModal').modal('hide');
+                window.location.reload();
+            }
+        });
+        // $("#picture").fileinput("upload");
+    }
+
+    //模态框关闭时销毁验证
+    // $("#myModal").on('hide.bs.modal',function(e){
+    //     $("#productForm").data('bootstrapValidator').destroy();
+    //     $('#productForm').data('bootstrapValidator',null);
+    // });
+
+    //模态框关闭后重置验证
+    $("#myModal").on('hidden.bs.modal',function(e){
+        $('#productForm').bootstrapValidator('resetForm');
+    });
+
+    //取消按钮
+    function cancel() {
+        $("#productForm").data('bootstrapValidator').destroy();
+        $('#productForm').data('bootstrapValidator',null);
+        $('#myModal').modal('hide');
+    }
+
+    //图片上传组件
+    // 上传附件
+    $("#picture").fileinput({
+        language:'zh',                                          // 多语言设置，需要引入local中相应的js，例如locales/zh.js
+        // theme: "fa",                               // 主题
+        uploadUrl: '/product/addProduct',         // 上传地址
+        uploadAsync: false,
+        allowedFileExtensions: ['jpg', 'gif', 'png'],  //接收的文件后缀
+        minFileCount: 0,                                        // 最小上传数量
+        maxFileCount: 1,                                        // 最大上传数量
+        maxFileSize: 10000,                             //最大文件大小 kb
+        overwriteInitial: false,                        // 覆盖初始预览内容和标题设置
+        showCancel:false,                                       // 显示取消按钮
+        showZoom:true,                                         // 显示预览按钮
+        showCaption:false,                                  // 显示文件文本框
+        dropZoneTitle: '拖拽文件到这里 …',
+        dropZoneEnabled:true,                          // 是否可拖拽
+        showUpload: false,                             //是否显示上传按钮
+        uploadLabel:"上传附件",                         // 上传按钮内容
+        browseLabel: '选择附件',                            // 浏览按钮内容
+        showRemove:true,                                       // 显示移除按钮
+        // browseClass:"layui-btn",                        // 浏览按钮样式
+        // uploadClass:"layui-btn",                        // 上传按钮样式
+        uploadExtraData: {'taskId':1,'createBy':2,'createByname':3},   // 上传数据
+        hideThumbnailContent:false,                  // 是否隐藏文件内容
+        fileActionSettings: {                               // 在预览窗口中为新选择的文件缩略图设置文件操作的对象配置
+            showRemove: true,                                   // 显示删除按钮
+            showUpload: false,                                   // 显示上传按钮
+            showDownload: false,                            // 显示下载按钮
+            showZoom: true,                                    // 显示预览按钮
+            showDrag: false,                                        // 显示拖拽
+            removeIcon: '<i class="fa fa-trash"></i>',   // 删除图标
+            uploadIcon: '<i class="fa fa-upload"></i>',     // 上传图标
+            uploadRetryIcon: '<i class="fa fa-repeat"></i>'  // 重试图标
+        },
+        layoutTemplates :{
+            actionDelete:'', //去除上传预览的缩略图中的删除图标
+            actionUpload:'',//去除上传预览缩略图中的上传图片；
+            // actionZoom:''   //去除上传预览缩略图中的查看详情预览的缩略图标。
+            indicator: ''
         }
     });
-
-    //新增按钮
-    $('#addBtn').click(function(){
-
+    // 上传成功回调
+    $("#picture").on("filebatchuploadcomplete", function() {
+        alert("上传附件成功");
+    });
+    // 上传失败回调
+    $('#picture').on('fileerror', function(event, data, msg) {
+        alert(data.msg);
     });
 
-    //
+    var dataURL;
+    $('#picture').on('change',function(e){
+        // 检查是否是图片
+        var filePath = $(this).val(),
+            fileFormat = filePath.substring(filePath.lastIndexOf(".")).toLowerCase();//获取文件后缀名
+        //检查后缀名
+        // if( !fileFormat.match(/.png|.jpg|.jpeg/) ) {
+            // showError('文件格式必须为：png/jpg/jpeg');//showError是另外写的一个显示错误信息的function
+        //     return;
+        // }
+
+        //获取并记录图片的base64编码
+        var reader = new FileReader();
+        reader.readAsDataURL(e.target.files[0]); // 读出 base64
+        reader.onloadend = function () {
+            // 图片的 base64 格式, 可以直接当成 img 的 src 属性值
+            dataURL = reader.result;//base64
+            // console.log(dataURL);
+            // console.log($('#picture').val());
+            // 显示图片
+            // $('#showImg').attr('src',dataURL);
+        };
+    });
+
+
 </script>

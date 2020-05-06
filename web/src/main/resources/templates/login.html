@@ -100,7 +100,7 @@
                                     <!-- 图片验证码结束 -->
 
 
-                                    <input type="submit" class="btn btn-primary btn-user btn-block" value="登录"/>
+                                    <input style="display: none" type="submit" id="loginBtn" class="btn btn-primary btn-user btn-block" value="登录"/>
 
                                     <!--                    <a href="index.html" class="btn btn-google btn-user btn-block">-->
                                     <!--                      <i class="fab fa-google fa-fw"></i> Login with Google-->
@@ -164,7 +164,7 @@
     var vcodeStatus = false;
 
     var loginError = '[[${errorMsg}]]';
-    console.log(loginError);
+    // console.log(loginError);
 
     if('' != loginError){
         toastr.error(loginError);
@@ -205,11 +205,17 @@
         dataList: dataList,
         success:function(){
             vcodeStatus = true;
+            $("#loginBtn").click();
         },
         fail: function(){
             vcodeStatus = false;
         }
     };
     SliderBar("slideBar", options);
+
+
+    function sleep(delay) {
+        for(var t = Date.now(); Date.now() - t <= delay;);
+    }
 
 </script>

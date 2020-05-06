@@ -24,7 +24,7 @@
                 "<div class='slide-bottom-no-logo'></div></div></div></div>" +
                 "<div class='scroll-background scroll-bar'>" +
                 "<div class='scroll-background slide-btn' id='slideBtn'></div>" +
-                "<div class='slide-title' id='slideHint'> <-按住滑块，拖动完成上面拼图</div></div></div>";
+                "<div class='slide-title' id='slideHint'> <-拖动完成拼图后自动登录</div></div></div>";
             this.targetDom.innerHTML = html;
             this.slideBtn = document.getElementById("slideBtn");                 // 拖拽按钮
             this.refreshBtn = document.getElementById("refreshBtn");             // 换图按钮

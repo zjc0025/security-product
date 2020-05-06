@@ -1,12 +1,17 @@
 package com.zjc.security.web.controller;
 
+import com.zjc.dao.model.SecurityUser;
+import com.zjc.dao.model.SysUser;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
+
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.security.Principal;
 
 /**
  * @ClassName HelloController
@@ -18,7 +23,11 @@ import java.net.URLDecoder;
 public class HomeController {
 
     @GetMapping("/home/index")
-    public String index(){
+    public String index(Model model, Authentication authentication){
+        SecurityUser securityUser = (SecurityUser) authentication.getPrincipal();
+        SysUser sysUser = securityUser.getCurrentUserInfo();
+        sysUser.setPassword("");
+        model.addAttribute("user",sysUser);
         return "home/index";
     }
 

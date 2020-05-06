@@ -39,11 +39,6 @@ public class ProductController {
         return "product/add";
     }
 
-    @GetMapping("/product/form")
-    public String form(){
-        return "product/form";
-    }
-
     @PostMapping("/product/addProduct")
     @ResponseBody
     public void addProduct(Product product){
