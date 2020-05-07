@@ -1,19 +1,15 @@
 package com.zjc.security.web.config;
 
-import com.zjc.security.web.service.MyUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.core.session.SessionRegistry;
-import org.springframework.security.core.session.SessionRegistryImpl;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
-import org.springframework.security.web.authentication.session.ConcurrentSessionControlAuthenticationStrategy;
 
 import javax.sql.DataSource;
 
@@ -29,9 +25,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
     private DataSource dataSource; // 数据源
-
-    @Autowired
-    MyUserDetailsService myUserDetailsService;
 
     /**
      * 自定义用户密码校验过滤器
@@ -59,12 +52,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .permitAll()
                 .and()
                 .logout()
-                .permitAll()
-                .and()
-                .rememberMe()
-                .userDetailsService(myUserDetailsService) // 设置userDetailsService
-                .tokenRepository(persistentTokenRepository()) // 设置数据访问层
-                .tokenValiditySeconds(24 * 60 * 60); // 记住我的时间(秒);
+                .permitAll();
+//                .and()
+//                .rememberMe()
+//                .userDetailsService(myUserDetailsService) // 设置userDetailsService
+//                .tokenRepository(persistentTokenRepository()) // 设置数据访问层
+//                .tokenValiditySeconds(24 * 60 * 60); // 记住我的时间(秒);
 
         //允许iframe
         http.headers().frameOptions().disable();

@@ -43,17 +43,41 @@
         </javaClientGenerator>
 
 
-<!--        <table tableName="USER" domainObjectName="SysUser"-->
+<!--        <table tableName="SYS_USER" domainObjectName="SysUser"-->
 <!--               enableCountByExample="false" enableUpdateByExample="false"-->
 <!--               enableDeleteByExample="false" enableSelectByExample="false"-->
 <!--               selectByExampleQueryId="false" >-->
 <!--        </table>-->
 
-        <table tableName="product" domainObjectName="Product"
-               enableCountByExample="false" enableUpdateByExample="false"
-               enableDeleteByExample="false" enableSelectByExample="false"
-               selectByExampleQueryId="false" >
-        </table>
+<!--        <table tableName="SYS_USER_ROLE" domainObjectName="SysUserRole"-->
+<!--               enableCountByExample="false" enableUpdateByExample="false"-->
+<!--               enableDeleteByExample="false" enableSelectByExample="false"-->
+<!--               selectByExampleQueryId="false" >-->
+<!--        </table>-->
+
+<!--        <table tableName="SYS_ROLE" domainObjectName="SysRole"-->
+<!--               enableCountByExample="false" enableUpdateByExample="false"-->
+<!--               enableDeleteByExample="false" enableSelectByExample="false"-->
+<!--               selectByExampleQueryId="false" >-->
+<!--        </table>-->
+
+<!--        <table tableName="SYS_ROLE_MENU" domainObjectName="SysRoleMenu"-->
+<!--               enableCountByExample="false" enableUpdateByExample="false"-->
+<!--               enableDeleteByExample="false" enableSelectByExample="false"-->
+<!--               selectByExampleQueryId="false" >-->
+<!--        </table>-->
+
+<!--        <table tableName="SYS_MENU" domainObjectName="SysMenu"-->
+<!--               enableCountByExample="false" enableUpdateByExample="false"-->
+<!--               enableDeleteByExample="false" enableSelectByExample="false"-->
+<!--               selectByExampleQueryId="false" >-->
+<!--        </table>-->
+
+<!--        <table tableName="product" domainObjectName="Product"-->
+<!--               enableCountByExample="false" enableUpdateByExample="false"-->
+<!--               enableDeleteByExample="false" enableSelectByExample="false"-->
+<!--               selectByExampleQueryId="false" >-->
+<!--        </table>-->
 
     </context>
 </generatorConfiguration>

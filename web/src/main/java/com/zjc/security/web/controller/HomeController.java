@@ -49,4 +49,9 @@ public class HomeController {
         return "login";
     }
 
+    @GetMapping("/home/dashboard")
+    public String dashboard(){
+        return "home/dashboard";
+    }
+
 }
