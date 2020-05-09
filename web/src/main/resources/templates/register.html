@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <title>SB Admin 2 - Register</title>
+
+  <!-- Custom fonts for this template-->
+  <link href="/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
+
+  <!-- Custom styles for this template-->
+  <link href="/css/sb-admin-2.min.css" rel="stylesheet">
+<!--  <link rel="stylesheet" href="/css/bootstrap.css">-->
+  <link rel="stylesheet" href="/css/bootstrapValidator.css">
+</head>
+
+<body class="bg-gradient-primary">
+
+  <div class="container">
+
+    <div class="card o-hidden border-0 shadow-lg my-5">
+      <div class="card-body p-0">
+        <!-- Nested Row within Card Body -->
+        <div class="row">
+          <div class="col-lg-5 d-none d-lg-block bg-register-image"></div>
+          <div class="col-lg-7">
+            <div class="p-5">
+              <div class="text-center">
+                <h1 class="h4 text-gray-900 mb-4">注册一个新的帐号!</h1>
+              </div>
+              <form class="user" id="registerForm">
+                <div class="form-group row">
+                  <div class="col-sm-6 mb-3 mb-sm-0">
+                    <input type="text" class="form-control form-control-user" id="username" name="username" placeholder="请输入用户名">
+                  </div>
+                  <div class="col-sm-6">
+                    <input type="text" class="form-control form-control-user" id="nickname" name="nickname" placeholder="请输入昵称">
+                  </div>
+                </div>
+<!--                <div class="form-group">-->
+<!--                  <input type="email" class="form-control form-control-user" id="exampleInputEmail" placeholder="Email Address">-->
+<!--                </div>-->
+                <div class="form-group row">
+                  <div class="col-sm-6 mb-3 mb-sm-0">
+                    <input type="password" class="form-control form-control-user" id="exampleInputPassword" name="password" placeholder="请输入密码">
+                  </div>
+                  <div class="col-sm-6">
+                    <input type="password" class="form-control form-control-user" id="exampleRepeatPassword" name="repeatPassword" placeholder="请再次输入密码">
+                  </div>
+                </div>
+                <button onclick="save()" class="btn btn-primary btn-user btn-block">
+                  注册账号
+                </button>
+<!--                <hr>-->
+<!--                <a href="index.html" class="btn btn-google btn-user btn-block">-->
+<!--                  <i class="fab fa-google fa-fw"></i> Register with Google-->
+<!--                </a>-->
+<!--                <a href="index.html" class="btn btn-facebook btn-user btn-block">-->
+<!--                  <i class="fab fa-facebook-f fa-fw"></i> Register with Facebook-->
+<!--                </a>-->
+              </form>
+              <hr>
+              <div class="text-center">
+                <a class="small" href="forgot-password.html">忘记密码?</a>
+              </div>
+              <div class="text-center">
+                <a class="small" href="/login">已有帐号? 去登录!</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Bootstrap core JavaScript-->
+  <script src="/vendor/jquery/jquery.min.js"></script>
+  <script src="/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+  <!-- Core plugin JavaScript-->
+  <script src="/vendor/jquery-easing/jquery.easing.min.js"></script>
+
+  <!-- Custom scripts for all pages-->
+  <script src="/js/sb-admin-2.min.js"></script>
+
+  <script src="/js/toastr.js"></script>
+  <script src="/js/bootstrapValidator.js"></script>
+
+
+</body>
+
+</html>
+<script>
+
+  $('#registerForm').bootstrapValidator({
+    message: 'This value is not valid',
+    //提供输入验证图标提示
+    feedbackIcons: {
+      valid: 'glyphicon glyphicon-ok',
+      invalid: 'glyphicon glyphicon-remove',
+      validating: 'glyphicon glyphicon-refresh'
+    },
+    fields: {
+      username: {
+        message: '用户名验证失败',
+        validators: {
+          notEmpty: {
+            message: '用户名不能为空'
+          },
+          stringLength: {
+            min: 3,
+            max: 20,
+            message: '用户名长度必须在3到20之间'
+          },
+          regexp: {
+            regexp: /^[a-zA-Z0-9_]{3,}$/,
+            message: '用户名只能包含大写、小写、数字和下划线'
+          },
+          threshold: 1, //设置1字符以上开始请求服务器
+          //有待验证，备注以备下次使用。
+          //bootstrap的remote验证器需要的返回结果一定是json格式的数据 :
+          //{"valid":false} //表示不合法，验证不通过
+          //{"valid":true} //表示合法，验证通过
+          // remote: {//发起Ajax请求。
+          //     url: '/product/checkCode',//验证地址
+          //     data: {code: $('input[name="code"]').val()},
+          //     message: '该型号产品存在',//提示消息
+          //     delay: 1000,//设置1秒发起名字验证
+          //     type: 'get' //请求方式
+          // }
+          callback:{
+            message:"用户名已存在",
+            callback:function (value,validator) {
+              var flag = false;
+              $.ajax({
+                url: '/account/checkUsername', // 请求路径
+                type: 'get',
+                async: false,	// 同步请求，必须是false
+                data:{
+                  code: $('input[name="username"]').val() // 请求参数
+                },
+                success:function(res){
+                  flag = res.valid;
+                }
+              });
+              return flag;
+            }
+          }
+        }
+      },
+      password: {
+        message: '密码验证失败',
+        validators: {
+          notEmpty: {
+            message: '密码不能为空'
+          },
+          stringLength: {
+            min: 6,
+            max: 20,
+            message: '密码长度必须在6到20之间'
+          },
+          regexp: {
+            regexp: /^[a-zA-Z0-9_]{6,}$/,
+            message: '密码只能包含大写、小写、数字和下划线'
+          }
+        }
+      }
+    }
+  });
+
+</script>

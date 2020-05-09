@@ -4,14 +4,12 @@ import com.zjc.dao.model.SecurityUser;
 import com.zjc.dao.model.SysUser;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
-
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
-import java.security.Principal;
 
 /**
  * @ClassName HelloController
@@ -29,11 +27,6 @@ public class HomeController {
         sysUser.setPassword("");
         model.addAttribute("user",sysUser);
         return "home/index";
-    }
-
-    @GetMapping("/timeout")
-    public String timeout(){
-        return "timeout";
     }
 
     @GetMapping("/login")
