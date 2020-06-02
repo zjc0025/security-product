@@ -2,4 +2,5 @@ rootProject.name = 'security'
 include 'web'
 include 'dao'
 include 'service'
+include 'authorization-server'
 

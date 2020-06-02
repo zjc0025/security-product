@@ -3,8 +3,8 @@
       xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
 <head>
     <title>Hello World!</title>
-    <meta name="_csrf" th:content="${_csrf.token}">
-    <meta name="_csrf_header" th:content="${_csrf.headerName}">
+<!--    <meta name="_csrf" th:content="${_csrf.token}">-->
+<!--    <meta name="_csrf_header" th:content="${_csrf.headerName}">-->
 
     <!-- CSS 部分 -->
     <!-- Bootstrap 3.3.7 -->
@@ -87,8 +87,8 @@
 </html>
 <script>
 
-    var token = $("meta[name='_csrf']").attr("content");
-    var header = $("meta[name='_csrf_header']").attr("content");
+    // var token = $("meta[name='_csrf']").attr("content");
+    // var header = $("meta[name='_csrf_header']").attr("content");
 
     $(function(){
         $("#dataTable").colResizable({
@@ -125,9 +125,9 @@
         showExport: true,
         toolbar:'#toolbar',//工具栏
         toolbarAlign:'left',//工具栏的位置
-        ajaxOptions:{
-            headers: JSON.parse('{"'+header+'": "'+token+'"}')
-        },
+        // ajaxOptions:{
+        //     headers: JSON.parse('{"'+header+'": "'+token+'"}')
+        // },
         detailView : true,
         detailFormatter : function (index, row) {
             var image = '<div class="photos">'
@@ -247,9 +247,9 @@
                 url: "/product/editProduct",
                 data: row,
                 // dataType: 'JSON',
-                beforeSend: function (xhr) {
-                    xhr.setRequestHeader(header, token);
-                },
+                // beforeSend: function (xhr) {
+                //     xhr.setRequestHeader(header, token);
+                // },
                 success: function (data) {
                     toastr.success('修改成功');
                 },

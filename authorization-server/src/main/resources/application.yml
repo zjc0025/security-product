@@ -1,0 +1,10 @@
+
+jdbc:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    jdbc-url: jdbc:mysql://localhost:3306/test?useSSL=false
+    username: test
+    password: 111111
+    validation-query: select 1 from dual
+    test-on-borrow: true
+    initialSize: 5

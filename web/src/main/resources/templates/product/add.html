@@ -3,8 +3,8 @@
       xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
 <head>
     <title>Hello World!</title>
-    <meta name="_csrf" th:content="${_csrf.token}">
-    <meta name="_csrf_header" th:content="${_csrf.headerName}">
+<!--    <meta name="_csrf" th:content="${_csrf.token}">-->
+<!--    <meta name="_csrf_header" th:content="${_csrf.headerName}">-->
 
     <!-- CSS 部分 -->
     <!-- Bootstrap 3.3.7 -->
@@ -132,8 +132,8 @@
 </html>
 <script>
 
-    var token = $("meta[name='_csrf']").attr("content");
-    var header = $("meta[name='_csrf_header']").attr("content");
+    // var token = $("meta[name='_csrf']").attr("content");
+    // var header = $("meta[name='_csrf_header']").attr("content");
 
     toastr.options = { // toastr配置
         "closeButton": true, //是否显示关闭按钮
@@ -235,10 +235,10 @@
             url: "/product/addProduct"
             , type: "post"
             , async: false
-            , beforeSend: function (xhr) {
-                xhr.setRequestHeader(header, token);
-            },
-            data: {
+            // , beforeSend: function (xhr) {
+            //     xhr.setRequestHeader(header, token);
+            // }
+            ,data: {
                 code: $('#code').val()
                 ,productName: $('#productName').val()
                 ,sample: $('#sample').val()

@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title></title>
+<!--    <meta th:name="_csrf" th:content="${_csrf.token}"/>-->
+<!--    <meta th:name="_csrf_header" th:content="${_csrf.headerName}"/>-->
+    <script src="/vendor/miniui/scripts/boot.js" type="text/javascript"></script>
+    <script src="/vendor/miniui/res/third-party/swfupload/swfupload.js" type="text/javascript"></script>
+    <script src="/vendor/miniui/res/js/multiupload.js" type="text/javascript"></script>
+    <link href="/vendor/miniui/res/css/multiupload.css" rel="stylesheet" type="text/css"/>
+<!--    <script src="/js/csrf.js"></script>-->
+</head>
+<body>
+<div id="multiupload1" class="uc-multiupload" style="width: 600px; height: 300px"
+     flashurl="/vendor/miniui/res/third-party/swfupload/swfupload.swf"
+     uploadurl="/miniui/upload" _autoUpload="true" limitType="*.txt;*jpg"
+     onuploaderror="onUploadError" onuploadsuccess="onUploadSuccess"
+>
+</div>
+</br>
+<a class="mini-button" onclick="getData">获取数据</a>
+<div class="description">
+    <h3>
+        Description</h3>
+    <pre>
+    属性名                  描述                             默认值
+    uploadUrl              上传后台地址
+    flashUrl               flash地址
+    limitType              允许选择文件类型                  "*"    //"*.txt;*jpg"
+    limitSize              默认最大上传文件大小              10MB
+    uploadName             后台接收上传文件的name            Fdata
+    queueLimit             上传队列最大文件数量              10
+    autoUpload             选择完文件是否自动上传            false
+    方法
+    setPostParam(object)   传递上传附加参数                 {}    //{a:1,b:2}
+    事件
+    uploadsuccess           上传成功
+    uploaderror             上传失败
+        </pre>
+</div>
+</body>
+</html>
+<script type="text/javascript">
+    mini.parse();
+
+    function getData() {
+        var grid = mini.get("multiupload1");
+        var data = grid.getData();
+        var json = mini.encode(data);
+        alert(json);
+    }
+
+    function onUploadSuccess(e) {
+        //e = { file, serverData }
+        //alert("上传成功：" + e.serverData);
+
+    }
+
+    function onUploadError(e) {
+        //e = { file, code, message }
+        alert("上传失败：" + e.file + ' ' + e.message);
+    }
+
+</script>

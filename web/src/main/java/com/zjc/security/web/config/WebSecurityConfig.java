@@ -64,6 +64,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
         // 自定义过滤器认证用户名密码
         http.addFilterAt(myAuthenticationProcessingFilter, UsernamePasswordAuthenticationFilter.class);
+
+        http.csrf().disable();
     }
 
 //    @Autowired
