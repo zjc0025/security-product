@@ -8,6 +8,7 @@ import org.springframework.security.oauth2.config.annotation.web.configuration.A
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableAuthorizationServer;
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerEndpointsConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerSecurityConfigurer;
+import org.springframework.security.oauth2.provider.client.JdbcClientDetailsService;
 import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
 import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
 
@@ -30,19 +31,33 @@ public class MyAuthorizationServerConfig extends AuthorizationServerConfigurerAd
     public void configure(AuthorizationServerSecurityConfigurer security) throws Exception {
         security.allowFormAuthenticationForClients();
         security.tokenKeyAccess("isAuthenticated()");
+        //允许表单认证
+        security.checkTokenAccess("permitAll()");
     }
 
     @Override
     public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
-        clients.jdbc(dataSource);
+        //这个地方指的是从jdbc查出数据来存储
+        clients.withClientDetails(jdbcClientDetailsService());
+    }
+
+    @Bean
+    public JdbcClientDetailsService  jdbcClientDetailsService() {
+        return new JdbcClientDetailsService(dataSource);
     }
 
     @Override
     public void configure(AuthorizationServerEndpointsConfigurer endpoints) throws Exception {
-        endpoints.accessTokenConverter(jwtAccessTokenConverter());
-        endpoints.tokenStore(jwtTokenStore());
-//        endpoints.tokenServices(defaultTokenServices());
+        // 最后一个参数为替换之后页面的url
+        endpoints.pathMapping("/oauth/confirm_access","/custom/confirm_access");
     }
+
+//    @Override
+//    public void configure(AuthorizationServerEndpointsConfigurer endpoints) throws Exception {
+//        endpoints.accessTokenConverter(jwtAccessTokenConverter());
+//        endpoints.tokenStore(jwtTokenStore());
+////        endpoints.tokenServices(defaultTokenServices());
+//    }
 
     /*@Primary
     @Bean
@@ -53,17 +68,17 @@ public class MyAuthorizationServerConfig extends AuthorizationServerConfigurerAd
         return defaultTokenServices;
     }*/
 
-    @Bean
-    public JwtTokenStore jwtTokenStore() {
-        return new JwtTokenStore(jwtAccessTokenConverter());
-    }
-
-    @Bean
-    public JwtAccessTokenConverter jwtAccessTokenConverter() {
-        JwtAccessTokenConverter jwtAccessTokenConverter = new JwtAccessTokenConverter();
-        jwtAccessTokenConverter.setSigningKey("zjc");   //  Sets the JWT signing key
-        return jwtAccessTokenConverter;
-    }
+//    @Bean
+//    public JwtTokenStore jwtTokenStore() {
+//        return new JwtTokenStore(jwtAccessTokenConverter());
+//    }
+//
+//    @Bean
+//    public JwtAccessTokenConverter jwtAccessTokenConverter() {
+//        JwtAccessTokenConverter jwtAccessTokenConverter = new JwtAccessTokenConverter();
+//        jwtAccessTokenConverter.setSigningKey("zjc");   //  Sets the JWT signing key
+//        return jwtAccessTokenConverter;
+//    }
 
 
 }
