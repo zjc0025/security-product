@@ -25,7 +25,8 @@ public class WebConfig implements WebMvcConfigurer {
                         "/scss/**",
                         "/vendor/**",
                         "/**/*.png",
-                        "/**/*.jpg"
+                        "/**/*.jpg",
+                        "/es/**"
                 );
     }
 

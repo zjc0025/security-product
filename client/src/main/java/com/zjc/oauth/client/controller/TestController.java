@@ -1,4 +1,4 @@
-package com.zjc.oauth.resource.controller;
+package com.zjc.oauth.client.controller;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -9,17 +9,17 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * @ClassName UserInfoController
+ * @ClassName TestController
  * @Description
  * @Author ZJC
- * @Date 2020/6/19 14:43
+ * @Date 2020/6/22 15:35
  */
 @RestController
 @RequestMapping("/user")
-public class UserInfoController {
+public class TestController {
 
-    @GetMapping("/userInfo")
-    public Map<String,String> meet(String id){
+    @GetMapping("/userInfo/{id}")
+    public Map<String,String> meet(@PathVariable("id") String id){
         System.out.println("获取id为："+ id + "的用户信息！");
         Map<String,String> map = new HashMap();
         map.put("id","123");

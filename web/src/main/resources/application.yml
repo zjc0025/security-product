@@ -18,18 +18,10 @@ jdbc:
     test-on-borrow: true
     initialSize: 5
 
-#jdbc:
-#  datasource:
-#    driver-class-name: oracle.jdbc.driver.OracleDriver
-#    jdbc-url: jdbc:oracle:thin:@10.1.51.220:1522:jdyy
-#    username: view360
-#    password: kingthis
-#    validation-query: select 1 from dual #指定获取连接时连接校验的sql查询语句
-#    test-on-borrow: true #当从连接池借用连接时，是否测试该连接.
-#    test-on-connect: true #创建时，是否测试连接
-#    test-while-idle: true #当连接空闲时，是否执行连接测试.
-#    time-between-eviction-runs-millis: 60000
-
 logging:
   level:
     com.eth.wallet.mapper: debug
+
+elasticsearch:
+  schema: http
+  listOfServer: 192.168.204.66:9200
