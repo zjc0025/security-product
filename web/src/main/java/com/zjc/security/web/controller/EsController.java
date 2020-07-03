@@ -2,9 +2,7 @@ package com.zjc.security.web.controller;
 
 import com.zjc.security.web.service.EsService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * @ClassName EsController
@@ -12,16 +10,60 @@ import org.springframework.web.bind.annotation.ResponseBody;
  * @Author ZJC
  * @Date 2020/7/3 9:08
  */
-@Controller
+@RestController
 public class EsController {
 
     @Autowired
     EsService esService;
 
-    @ResponseBody
     @PutMapping("/es/createIndex")
     public String createIndex(String indexName){
         return esService.createIndex(indexName);
+    }
+
+    @GetMapping("/es/getRequest")
+    public String getRequest(String indexName){
+        return esService.getRequest(indexName);
+    }
+
+    @GetMapping("/es/getSourceRequest")
+    public String getSourceRequest(String indexName){
+        return esService.getSourceRequest(indexName);
+    }
+
+    @GetMapping("/es/existsRequest")
+    public String existsRequest(String indexName){
+        return esService.existsRequest(indexName);
+    }
+
+    @DeleteMapping("/es/deleteRequest")
+    public String deleteRequest(String indexName){
+        return esService.deleteRequest(indexName);
+    }
+
+    @PutMapping("/es/updateRequest")
+    public String updateRequest(String indexName){
+        return esService.updateRequest(indexName);
+    }
+
+    @GetMapping("/es/termVectorsRequest")
+    public String termVectorsRequest(String indexName){
+        return esService.termVectorsRequest(indexName);
+    }
+
+    @PostMapping("/es/bulkRequest")
+    public String bulkRequest(String indexName){
+        return esService.bulkRequest(indexName);
+    }
+
+    @GetMapping("/es/multiGetRequest")
+    public String multiGetRequest(String indexName){
+        return esService.multiGetRequest(indexName);
+    }
+
+    @GetMapping("/es/reindexRequest")
+    public String reindexRequest(String indexName){
+        return esService.reindexRequest(indexName);
     }
 
 }
