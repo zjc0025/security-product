@@ -38,6 +38,9 @@ dependencies {
     compile 'org.elasticsearch.client:elasticsearch-rest-high-level-client:7.7.0'
     compile 'org.elasticsearch:elasticsearch:7.7.0'
 
+    compile 'org.springframework.boot:spring-boot-starter-data-redis'
+    compile 'org.springframework.boot:spring-boot-starter-test'
+
     annotationProcessor 'org.projectlombok:lombok'
 }
 

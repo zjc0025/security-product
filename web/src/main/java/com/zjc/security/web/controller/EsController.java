@@ -66,4 +66,24 @@ public class EsController {
         return esService.reindexRequest(indexName);
     }
 
+    @PostMapping("/es/updateByQueryRequest")
+    public String updateByQueryRequest(String indexName){
+        return esService.updateByQueryRequest(indexName);
+    }
+
+    @DeleteMapping("/es/deleteByQueryRequest")
+    public String deleteByQueryRequest(String indexName){
+        return esService.deleteByQueryRequest(indexName);
+    }
+
+    @PostMapping("/es/rethrottleRequest")
+    public String rethrottleRequest(String indexName){
+        return esService.rethrottleRequest(indexName);
+    }
+
+    @PostMapping("/es/multiTermVectorsRequest")
+    public String multiTermVectorsRequest(String indexName){
+        return esService.multiTermVectorsRequest(indexName);
+    }
+
 }

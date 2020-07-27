@@ -2,9 +2,11 @@ package com.zjc.security.web.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.ElasticsearchException;
-import org.elasticsearch.action.ActionListener;
 import org.elasticsearch.action.DocWriteRequest;
 import org.elasticsearch.action.DocWriteResponse;
+import org.elasticsearch.action.TaskOperationFailure;
+import org.elasticsearch.action.admin.cluster.node.tasks.list.ListTasksResponse;
+import org.elasticsearch.action.admin.cluster.node.tasks.list.TaskGroup;
 import org.elasticsearch.action.bulk.BulkItemResponse;
 import org.elasticsearch.action.bulk.BulkRequest;
 import org.elasticsearch.action.bulk.BulkResponse;
@@ -13,27 +15,26 @@ import org.elasticsearch.action.delete.DeleteResponse;
 import org.elasticsearch.action.get.*;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.index.IndexResponse;
-import org.elasticsearch.action.support.ActiveShardCount;
+import org.elasticsearch.action.support.IndicesOptions;
 import org.elasticsearch.action.support.WriteRequest;
 import org.elasticsearch.action.support.replication.ReplicationResponse;
 import org.elasticsearch.action.update.UpdateRequest;
 import org.elasticsearch.action.update.UpdateResponse;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
-import org.elasticsearch.client.core.GetSourceRequest;
-import org.elasticsearch.client.core.GetSourceResponse;
-import org.elasticsearch.client.core.TermVectorsRequest;
-import org.elasticsearch.client.core.TermVectorsResponse;
+import org.elasticsearch.client.RethrottleRequest;
+import org.elasticsearch.client.core.*;
 import org.elasticsearch.common.Strings;
 import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.common.xcontent.XContentFactory;
 import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.index.VersionType;
-import org.elasticsearch.index.reindex.ReindexRequest;
-import org.elasticsearch.script.Script;
-import org.elasticsearch.script.ScriptType;
+import org.elasticsearch.index.query.TermQueryBuilder;
+import org.elasticsearch.index.reindex.*;
 import org.elasticsearch.search.fetch.subphase.FetchSourceContext;
+import org.elasticsearch.tasks.TaskId;
+import org.elasticsearch.tasks.TaskInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
@@ -548,12 +549,234 @@ public class EsService {
             request.setSourceIndices("source1", "source2");
             //目标索引
             request.setDestIndex("dest");
-            //设置目标索引版本号类型为外部
+            //设置目标索引版本号类型为外部  （从源保留版本）
             request.setDestVersionType(VersionType.EXTERNAL);
+            //将opType设置为create将导致_reindex仅在目标索引中创建丢失的文档。 所有现有文档都将导致版本冲突。 默认的opType是index
+            request.setDestOpType("create");
+            //遇到冲突继续执行
+            request.setConflicts("proceed");
+            //指定文档重建
+            request.setSourceQuery(new TermQueryBuilder("user", "kimchy"));
+            //设置最大文档数量
+            request.setMaxDocs(10);
+            //设置分批次数
+            request.setSourceBatchSize(100);
 
+            //可从远程es集群重建索引
+//            request.setRemoteInfo(
+//                    new RemoteInfo(
+//                            "http", remoteHost, remotePort, null,
+//                            new BytesArray(new MatchAllQueryBuilder().toString()),
+//                            user, password, Collections.emptyMap(),
+//                            new TimeValue(100, TimeUnit.MILLISECONDS),
+//                            new TimeValue(100, TimeUnit.SECONDS)
+//                    )
+//            );
+
+            //设置要使用的切片数
+            request.setSlices(2);
+            //设置搜索上下文保持活动的时间
+            request.setScroll(TimeValue.timeValueMinutes(10));
+
+            BulkByScrollResponse bulkResponse =
+                    client.reindex(request, RequestOptions.DEFAULT);
+
+            //还可以使用Task API提交ReindexRequest而不等待其完成。 这等效于将wait_for_completion标志设置为false的REST请求。
+//            ReindexRequest reindexRequest = new ReindexRequest();
+//            reindexRequest.setSourceIndices(sourceIndex);//源索引
+//            reindexRequest.setDestIndex(destinationIndex);//目标索引
+//            reindexRequest.setRefresh(true);
+//            TaskSubmissionResponse reindexSubmission = client
+//                    .submitReindexTask(reindexRequest, RequestOptions.DEFAULT);
+//            String taskId = reindexSubmission.getTask();
+
+            //结果分析
+            TimeValue timeTaken = bulkResponse.getTook(); //用时
+            boolean timedOut = bulkResponse.isTimedOut(); //是否超时
+            long totalDocs = bulkResponse.getTotal();     //文档数
+            long updatedDocs = bulkResponse.getUpdated(); //更新文档数
+            long createdDocs = bulkResponse.getCreated(); //创建文档数
+            long deletedDocs = bulkResponse.getDeleted(); //删除文档数
+            long batches = bulkResponse.getBatches();     //执行批次数
+            long noops = bulkResponse.getNoops();         //跳过的文档数
+            long versionConflicts = bulkResponse.getVersionConflicts(); //版本冲突数
+            long bulkRetries = bulkResponse.getBulkRetries(); //重试批量索引操作的次数
+            long searchRetries = bulkResponse.getSearchRetries(); //查询重试次数
+            TimeValue throttledMillis = bulkResponse.getStatus().getThrottled(); //此请求已自行节流的总时间
+            TimeValue throttledUntilMillis =
+                    bulkResponse.getStatus().getThrottledUntil(); //当前节气门睡眠的剩余延迟，如果未睡眠则为0
+            List<ScrollableHitSource.SearchFailure> searchFailures =
+                    bulkResponse.getSearchFailures(); //查询失败
+            List<BulkItemResponse.Failure> bulkFailures =
+                    bulkResponse.getBulkFailures();   //块索引操作失败
+
+            res = "操作文档数：" + totalDocs;
+        }catch (Exception e){
+            res = e.getMessage();
+        }
+        return res;
+    }
+
+    public String updateByQueryRequest(String indexName) {
+        String res = "";
+        try{
+
+            UpdateByQueryRequest request = new UpdateByQueryRequest("source1", "source2");
+            request.setConflicts("proceed");//冲突继续
+            request.setQuery(new TermQueryBuilder("user", "kimchy"));
+            request.setMaxDocs(10);
+            request.setBatchSize(100);
+
+            request.setSlices(2); //切片数
+            request.setScroll(TimeValue.timeValueMinutes(10)); //滚动查询时间
+
+            BulkByScrollResponse bulkResponse =
+                    client.updateByQuery(request, RequestOptions.DEFAULT);
+
+            //结果
+            TimeValue timeTaken = bulkResponse.getTook();
+            boolean timedOut = bulkResponse.isTimedOut();
+            long totalDocs = bulkResponse.getTotal();
+            long updatedDocs = bulkResponse.getUpdated();
+            long deletedDocs = bulkResponse.getDeleted();
+            long batches = bulkResponse.getBatches();
+            long noops = bulkResponse.getNoops();
+            long versionConflicts = bulkResponse.getVersionConflicts();
+            long bulkRetries = bulkResponse.getBulkRetries();
+            long searchRetries = bulkResponse.getSearchRetries();
+            TimeValue throttledMillis = bulkResponse.getStatus().getThrottled();
+            TimeValue throttledUntilMillis =
+                    bulkResponse.getStatus().getThrottledUntil();
+            List<ScrollableHitSource.SearchFailure> searchFailures =
+                    bulkResponse.getSearchFailures();
+            List<BulkItemResponse.Failure> bulkFailures =
+                    bulkResponse.getBulkFailures();
+
+            res = "操作文档数：" + totalDocs;
 
         }catch (Exception e){
+            res = e.getMessage();
+        }
+        return res;
+    }
 
+    public String deleteByQueryRequest(String indexName) {
+        String res = "";
+        try{
+
+            DeleteByQueryRequest request = new DeleteByQueryRequest("source1", "source2");
+            request.setConflicts("proceed");
+            request.setQuery(new TermQueryBuilder("user", "kimchy"));
+            request.setMaxDocs(10);
+            request.setBatchSize(100);
+
+            request.setIndicesOptions(IndicesOptions.LENIENT_EXPAND_OPEN);
+
+            BulkByScrollResponse bulkResponse =
+                    client.deleteByQuery(request, RequestOptions.DEFAULT);
+
+            //结果
+            TimeValue timeTaken = bulkResponse.getTook();
+            boolean timedOut = bulkResponse.isTimedOut();
+            long totalDocs = bulkResponse.getTotal();
+            long deletedDocs = bulkResponse.getDeleted();
+            long batches = bulkResponse.getBatches();
+            long noops = bulkResponse.getNoops();
+            long versionConflicts = bulkResponse.getVersionConflicts();
+            long bulkRetries = bulkResponse.getBulkRetries();
+            long searchRetries = bulkResponse.getSearchRetries();
+            TimeValue throttledMillis = bulkResponse.getStatus().getThrottled();
+            TimeValue throttledUntilMillis =
+                    bulkResponse.getStatus().getThrottledUntil();
+            List<ScrollableHitSource.SearchFailure> searchFailures =
+                    bulkResponse.getSearchFailures();
+            List<BulkItemResponse.Failure> bulkFailures =
+                    bulkResponse.getBulkFailures();
+
+            res = "操作文档数：" + totalDocs;
+
+        }catch (Exception e){
+            res = e.getMessage();
+        }
+        return res;
+    }
+
+    /**
+     *   RethrottleRequest可用于更改正在运行的reindex, update-by-query或delete-by-query的当前限制，
+     *   或者完全禁用任务的限制，它要求更改任务的任务标识。
+     **/
+    public String rethrottleRequest(String indexName) {
+        String res = "";
+        try{
+            TaskId taskId = new TaskId("taskId");
+            //禁用正在运行的任务
+            RethrottleRequest request = new RethrottleRequest(taskId);
+            //将任务限制更改为每秒100个请求
+//            RethrottleRequest request = new RethrottleRequest(taskId, 100.0f);
+
+            ListTasksResponse response = client.reindexRethrottle(request, RequestOptions.DEFAULT);  //执行重新索引重新调用请求
+//            client.updateByQueryRethrottle(request, RequestOptions.DEFAULT); //按查询更新也是如此
+//            client.deleteByQueryRethrottle(request, RequestOptions.DEFAULT); //按查询删除也是如此
+
+            List<TaskInfo> tasks = response.getTasks();
+
+            //根据节点分组
+            Map<String, List<TaskInfo>> perNodeTasks = response.getPerNodeTasks();
+            //根据父任务分组
+            List<TaskGroup> groups = response.getTaskGroups();
+
+            //节点失败内容
+            List<ElasticsearchException> nodeFailures = response.getNodeFailures();
+            //任务失败
+            List<TaskOperationFailure> taskFailures = response.getTaskFailures();
+
+            res = "success";
+
+        }catch (Exception e){
+            res = e.getMessage();
+        }
+        return res;
+    }
+
+    public String multiTermVectorsRequest(String indexName) {
+        String res = "";
+        try{
+            //方式一
+            MultiTermVectorsRequest request = new MultiTermVectorsRequest();
+            TermVectorsRequest tvrequest1 =
+                    new TermVectorsRequest("authors", "1");
+            tvrequest1.setFields("user");
+            request.add(tvrequest1);
+
+            XContentBuilder docBuilder = XContentFactory.jsonBuilder();
+            docBuilder.startObject().field("user", "guest-user").endObject();
+            TermVectorsRequest tvrequest2 =
+                    new TermVectorsRequest("authors", docBuilder);
+            request.add(tvrequest2);
+
+            //方式二（当所有TermVectorsRequest共享相同的参数(如索引和其他设置)时，
+            // 可以使用第二种方法。在这种情况下，可以创建一个模板TermVectorsRequest，
+            // 并设置所有必要的设置，该模板请求可以与执行这些请求的所有文档id一起传递给MultiTermVectorsRequest。）
+//            TermVectorsRequest tvrequestTemplate =
+//                    new TermVectorsRequest("authors", "fake_id");
+//            tvrequestTemplate.setFields("user");
+//            String[] ids = {"1", "2"};
+//            MultiTermVectorsRequest request =
+//                    new MultiTermVectorsRequest(ids, tvrequestTemplate);
+
+            MultiTermVectorsResponse response =
+                    client.mtermvectors(request, RequestOptions.DEFAULT);
+
+            List<TermVectorsResponse> tvresponseList =
+                    response.getTermVectorsResponses();
+            if (tvresponseList != null) {
+                for (TermVectorsResponse tvresponse : tvresponseList) {
+                    log.info("响应：{}",tvresponse.getId());
+                }
+            }
+
+        }catch (Exception e){
+            res = e.getMessage();
         }
         return res;
     }
