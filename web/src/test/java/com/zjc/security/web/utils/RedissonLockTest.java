@@ -6,6 +6,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -105,6 +107,44 @@ public class RedissonLockTest {
             // 加锁操作
             testLockCount();
         }
+
+    }
+
+    /**
+     * Redisson看门狗测试
+     * <p>
+     * 1.加锁时不设置失效时间则启用默认的看门狗，默认失效时间为30秒，可设置{@link RedissonConfig}
+     * 看门狗每10秒查看是否锁还未释放，未释放则再加30秒过期时间
+     * <p>
+     * 2.加锁时设置了过期时间，则看门狗失效
+     **/
+    @Test
+    public void testWatchDag() throws InterruptedException {
+        ExecutorService executor = Executors.newFixedThreadPool(10);
+        for (int i = 0; i < 10; i++) {
+            executor.submit(() -> {
+                System.out.println("线程：" + Thread.currentThread().getName() + "启动");
+                RedisLockUtil.lock("watchdog");
+//                    RedisLockUtil.lock("watchdog",20, TimeUnit.SECONDS);
+                long startTime = 0;
+                long endTime = 0;
+                try {
+                    startTime = System.currentTimeMillis();
+                    System.out.println(Thread.currentThread().getName() + "业务执行中。。。");
+                    Thread.sleep(33000);
+                    endTime = System.currentTimeMillis();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                } finally {
+                    RedisLockUtil.unlock("watchdog");
+                    System.out.println(Thread.currentThread().getName() + "执行时间：" + (endTime - startTime));
+                }
+            });
+        }
+        boolean loop;
+        do {    //等待所有任务完成
+            loop = !executor.awaitTermination(2, TimeUnit.SECONDS);  //阻塞，直到线程池里所有任务结束
+        } while (loop);
 
     }
 
