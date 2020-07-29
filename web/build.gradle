@@ -39,6 +39,7 @@ dependencies {
     compile 'org.elasticsearch:elasticsearch:7.7.0'
 
     compile 'org.springframework.boot:spring-boot-starter-data-redis'
+    compile 'org.redisson:redisson-spring-boot-starter:3.10.6'
     compile 'org.springframework.boot:spring-boot-starter-test'
 
     annotationProcessor 'org.projectlombok:lombok'

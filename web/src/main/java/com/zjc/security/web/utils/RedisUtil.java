@@ -1,5 +1,6 @@
 package com.zjc.security.web.utils;
 
+import org.apache.poi.ss.formula.functions.T;
 import org.elasticsearch.common.recycler.Recycler;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ZSetOperations;
@@ -7,6 +8,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -517,15 +519,15 @@ public final class RedisUtil {
     }
 
     /**
-     * 将list放入缓存
+     * 将list中的原色一个个放入缓存
      *
      * @param key   键
      * @param value 值
      * @return
      */
-    public boolean lSet(String key, List<Object> value) {
+    public boolean lSet(String key, List<?> value) {
         try {
-            redisTemplate.opsForList().rightPushAll(key, value);
+            value.forEach(x -> redisTemplate.opsForList().rightPushAll(key, x));
             return true;
         } catch (Exception e) {
             e.printStackTrace();
@@ -534,7 +536,7 @@ public final class RedisUtil {
     }
 
     /**
-     * 将list放入缓存
+     * 将list中的原色一个个放入缓存 并设置超时时间
      *
      * @param key   键
      * @param value 值
@@ -543,7 +545,7 @@ public final class RedisUtil {
      */
     public boolean lSet(String key, List<Object> value, long time) {
         try {
-            redisTemplate.opsForList().rightPushAll(key, value);
+            value.forEach(x -> redisTemplate.opsForList().rightPushAll(key, x));
             if (time > 0)
                 expire(key, time);
             return true;
