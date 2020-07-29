@@ -24,7 +24,7 @@ public class MyAuthenticationManager implements AuthenticationManager {
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
         //身份验证
         Authentication result = myAuthenticationProvider.authenticate(authentication);
-        if(null == result){
+        if (null == result) {
             throw new ProviderNotFoundException("Authentication failed!");
         }
         return result;

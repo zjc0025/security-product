@@ -17,72 +17,72 @@ public class EsController {
     EsService esService;
 
     @PutMapping("/es/createIndex")
-    public String createIndex(String indexName){
+    public String createIndex(String indexName) {
         return esService.createIndex(indexName);
     }
 
     @GetMapping("/es/getRequest")
-    public String getRequest(String indexName){
+    public String getRequest(String indexName) {
         return esService.getRequest(indexName);
     }
 
     @GetMapping("/es/getSourceRequest")
-    public String getSourceRequest(String indexName){
+    public String getSourceRequest(String indexName) {
         return esService.getSourceRequest(indexName);
     }
 
     @GetMapping("/es/existsRequest")
-    public String existsRequest(String indexName){
+    public String existsRequest(String indexName) {
         return esService.existsRequest(indexName);
     }
 
     @DeleteMapping("/es/deleteRequest")
-    public String deleteRequest(String indexName){
+    public String deleteRequest(String indexName) {
         return esService.deleteRequest(indexName);
     }
 
     @PutMapping("/es/updateRequest")
-    public String updateRequest(String indexName){
+    public String updateRequest(String indexName) {
         return esService.updateRequest(indexName);
     }
 
     @GetMapping("/es/termVectorsRequest")
-    public String termVectorsRequest(String indexName){
+    public String termVectorsRequest(String indexName) {
         return esService.termVectorsRequest(indexName);
     }
 
     @PostMapping("/es/bulkRequest")
-    public String bulkRequest(String indexName){
+    public String bulkRequest(String indexName) {
         return esService.bulkRequest(indexName);
     }
 
     @GetMapping("/es/multiGetRequest")
-    public String multiGetRequest(String indexName){
+    public String multiGetRequest(String indexName) {
         return esService.multiGetRequest(indexName);
     }
 
     @GetMapping("/es/reindexRequest")
-    public String reindexRequest(String indexName){
+    public String reindexRequest(String indexName) {
         return esService.reindexRequest(indexName);
     }
 
     @PostMapping("/es/updateByQueryRequest")
-    public String updateByQueryRequest(String indexName){
+    public String updateByQueryRequest(String indexName) {
         return esService.updateByQueryRequest(indexName);
     }
 
     @DeleteMapping("/es/deleteByQueryRequest")
-    public String deleteByQueryRequest(String indexName){
+    public String deleteByQueryRequest(String indexName) {
         return esService.deleteByQueryRequest(indexName);
     }
 
     @PostMapping("/es/rethrottleRequest")
-    public String rethrottleRequest(String indexName){
+    public String rethrottleRequest(String indexName) {
         return esService.rethrottleRequest(indexName);
     }
 
     @PostMapping("/es/multiTermVectorsRequest")
-    public String multiTermVectorsRequest(String indexName){
+    public String multiTermVectorsRequest(String indexName) {
         return esService.multiTermVectorsRequest(indexName);
     }
 

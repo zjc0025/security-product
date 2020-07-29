@@ -1,7 +1,5 @@
 package com.zjc.security.web.config;
 
-import com.zjc.dao.model.SecurityUser;
-import com.zjc.dao.model.SysUser;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;

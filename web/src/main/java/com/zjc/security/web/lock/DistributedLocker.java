@@ -1,4 +1,4 @@
-package com.zjc.security.web.utils;
+package com.zjc.security.web.lock;
 
 import org.redisson.api.RLock;
 

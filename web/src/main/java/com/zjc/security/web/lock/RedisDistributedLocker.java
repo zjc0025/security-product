@@ -1,4 +1,4 @@
-package com.zjc.security.web.utils;
+package com.zjc.security.web.lock;
 
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
@@ -34,7 +34,7 @@ public class RedisDistributedLocker implements DistributedLocker {
     }
 
     @Override
-    public RLock lock(String lockKey, TimeUnit unit ,int timeout) {
+    public RLock lock(String lockKey, TimeUnit unit, int timeout) {
         RLock lock = redissonClient.getLock(lockKey);
         lock.lock(timeout, unit);
         return lock;

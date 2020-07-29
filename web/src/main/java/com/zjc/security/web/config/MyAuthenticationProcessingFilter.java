@@ -30,7 +30,7 @@ public class MyAuthenticationProcessingFilter extends AbstractAuthenticationProc
     private static final String PASSWORD_PARAMETER = "password";
 
     /**
-     * @param authenticationManager:             认证管理器
+     * @param authenticationManager:          认证管理器
      * @param myAuthenticationSuccessHandler: 认证成功处理
      * @param myAuthenticationFailureHandler: 认证失败处理
      */
@@ -38,7 +38,7 @@ public class MyAuthenticationProcessingFilter extends AbstractAuthenticationProc
                                             MyAuthenticationSuccessHandler myAuthenticationSuccessHandler,
                                             MyAuthenticationFailureHandler myAuthenticationFailureHandler,
                                             MySessionAuthenticationStrategy mySessionAuthenticationStrategy
-                                            ) {
+    ) {
         super(new AntPathRequestMatcher("/login", "POST"));
         this.setAuthenticationManager(authenticationManager);
         this.setAuthenticationSuccessHandler(myAuthenticationSuccessHandler);
@@ -74,18 +74,6 @@ public class MyAuthenticationProcessingFilter extends AbstractAuthenticationProc
         } catch (Exception e) {
             throw new AuthenticationServiceException(e.getMessage());
         }
-
-//        SysUser sysUser = new SysUser();
-//        sysUser.setUsername(username);
-//        //获取当前用户已登录的session信息
-//        SessionRegistry sessionRegistry = mySessionAuthenticationStrategy.getSessionRegistry();
-//        List<SessionInformation> infos = sessionRegistry.getAllSessions(new SecurityUser(sysUser),true);
-//        for(SessionInformation info : infos){
-//            if(info.getSessionId().equals(request.getSession().getId()) && info.isExpired()){
-//                sessionRegistry.removeSessionInformation(info.getSessionId());
-//                throw new AuthenticationServiceException("登陆过期");
-//            }
-//        }
 
         return this.getAuthenticationManager().authenticate(authRequest);
     }

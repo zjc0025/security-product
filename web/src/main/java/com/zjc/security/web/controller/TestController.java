@@ -21,7 +21,7 @@ import java.io.IOException;
 public class TestController {
 
     @GetMapping("/test/sub2")
-    public String multiUpload(){
+    public String multiUpload() {
         return "test/sub2";
     }
 

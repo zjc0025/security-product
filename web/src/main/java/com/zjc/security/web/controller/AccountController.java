@@ -20,12 +20,12 @@ public class AccountController {
     AccountService accountService;
 
     @GetMapping("/register")
-    public String register(){
+    public String register() {
         return "register";
     }
 
     @PostMapping("/registerAccount")
-    public void registerAccount(SysUser sysUser){
+    public void registerAccount(SysUser sysUser) {
         accountService.registerAccount(sysUser);
     }
 

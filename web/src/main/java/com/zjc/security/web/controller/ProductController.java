@@ -24,36 +24,36 @@ public class ProductController {
     ProductService productService;
 
     @GetMapping("/product/index")
-    public String index(){
+    public String index() {
         return "product/index";
     }
 
     @PostMapping("/product/list")
     @ResponseBody
-    public List<Product> getProductList(){
+    public List<Product> getProductList() {
         return productService.getAllProduct();
     }
 
     @GetMapping("/product/add")
-    public String add(){
+    public String add() {
         return "product/add";
     }
 
     @PostMapping("/product/addProduct")
     @ResponseBody
-    public void addProduct(Product product){
+    public void addProduct(Product product) {
         productService.addProduct(product);
     }
 
     @PostMapping("/product/editProduct")
     @ResponseBody
-    public void editProduct(Product product){
+    public void editProduct(Product product) {
         productService.editProduct(product);
     }
 
     @GetMapping("/product/checkCode")
     @ResponseBody
-    public ValidateVo checkProductCode(String code){
+    public ValidateVo checkProductCode(String code) {
         ValidateVo validateVo = new ValidateVo();
         boolean res = productService.checkProductCode(code);
         validateVo.setValid(res);

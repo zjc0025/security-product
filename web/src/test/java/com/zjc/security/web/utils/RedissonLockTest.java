@@ -1,5 +1,7 @@
 package com.zjc.security.web.utils;
 
+import com.zjc.security.web.lock.RedisLockUtil;
+import com.zjc.security.web.lock.RedissonConfig;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;

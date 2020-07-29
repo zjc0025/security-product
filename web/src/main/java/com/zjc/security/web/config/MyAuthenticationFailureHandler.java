@@ -1,11 +1,7 @@
 package com.zjc.security.web.config;
 
-import com.zjc.security.web.utils.ResponseUtils;
-import com.zjc.security.web.vo.ApiResult;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.authentication.*;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.stereotype.Component;
 
@@ -44,7 +40,7 @@ public class MyAuthenticationFailureHandler implements AuthenticationFailureHand
 //        }
 //        ResponseUtils.out(response, result);
 
-        response.sendRedirect("/loginFail?msg="+ URLEncoder.encode(e.getMessage(),"utf-8"));
+        response.sendRedirect("/loginFail?msg=" + URLEncoder.encode(e.getMessage(), "utf-8"));
     }
 
 }

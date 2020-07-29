@@ -34,13 +34,12 @@ public class MySessionAuthenticationStrategy implements SessionAuthenticationStr
 
     /**
      * @param sessionRegistry the session registry which should be updated when the
-     * authenticated session is changed.
+     *                        authenticated session is changed.
      */
 //    public MySessionAuthenticationStrategy(SessionRegistry sessionRegistry) {
 //        Assert.notNull(sessionRegistry, "The sessionRegistry cannot be null");
 //        this.sessionRegistry = sessionRegistry;
 //    }
-
     public SessionRegistry getSessionRegistry() {
         return this.sessionRegistry;
     }
@@ -50,16 +49,14 @@ public class MySessionAuthenticationStrategy implements SessionAuthenticationStr
      * with the new session information.
      */
     public void onAuthentication(Authentication authentication,
-                                 HttpServletRequest request, HttpServletResponse response) throws SessionAuthenticationException{
-
+                                 HttpServletRequest request, HttpServletResponse response) throws SessionAuthenticationException {
 
 
         final List<SessionInformation> sessions = sessionRegistry.getAllSessions(
                 authentication.getPrincipal(), false);
 
         int sessionCount = sessions.size();
-        int allowedSessions = getMaximumSessionsForThisUser(authentication,sessionRegistry);
-
+        int allowedSessions = getMaximumSessionsForThisUser(authentication, sessionRegistry);
 
 
 //        if (allowedSessions == -1) {
@@ -85,7 +82,7 @@ public class MySessionAuthenticationStrategy implements SessionAuthenticationStr
 
 
 //        try {
-            allowableSessionsExceeded(sessions, allowedSessions, sessionRegistry);
+        allowableSessionsExceeded(sessions, allowedSessions, sessionRegistry);
 //        } catch (Exception e) {
 //            try {
 //                response.sendRedirect("timeout");
@@ -105,14 +102,13 @@ public class MySessionAuthenticationStrategy implements SessionAuthenticationStr
      * simply returns the <code>maximumSessions</code> value for the bean.
      *
      * @param authentication to determine the maximum sessions for
-     *
      * @return either -1 meaning unlimited, or a positive integer to limit (never zero)
      */
-    protected int getMaximumSessionsForThisUser(Authentication authentication,SessionRegistry sessionRegistry) {
+    protected int getMaximumSessionsForThisUser(Authentication authentication, SessionRegistry sessionRegistry) {
 
         SecurityUser currUser = (SecurityUser) authentication.getPrincipal();
         //获得所有登陆的用户及其sessionId
-        List<SessionInformation> securityUsers = sessionRegistry.getAllSessions(currUser,false);
+        List<SessionInformation> securityUsers = sessionRegistry.getAllSessions(currUser, false);
 
         return securityUsers.size();
     }
@@ -120,12 +116,11 @@ public class MySessionAuthenticationStrategy implements SessionAuthenticationStr
     /**
      * Allows subclasses to customise behaviour when too many sessions are detected.
      *
-     * @param sessions either <code>null</code> or all unexpired sessions associated with
-     * the principal
+     * @param sessions          either <code>null</code> or all unexpired sessions associated with
+     *                          the principal
      * @param allowableSessions the number of concurrent sessions the user is allowed to
-     * have
-     * @param registry an instance of the <code>SessionRegistry</code> for subclass use
-     *
+     *                          have
+     * @param registry          an instance of the <code>SessionRegistry</code> for subclass use
      */
     protected void allowableSessionsExceeded(List<SessionInformation> sessions,
                                              int allowableSessions, SessionRegistry registry)
@@ -133,7 +128,7 @@ public class MySessionAuthenticationStrategy implements SessionAuthenticationStr
         if (exceptionIfMaximumExceeded || (sessions == null)) {
             throw new SessionAuthenticationException(messages.getMessage(
                     "ConcurrentSessionControlAuthenticationStrategy.exceededAllowed",
-                    new Object[] { Integer.valueOf(allowableSessions) },
+                    new Object[]{Integer.valueOf(allowableSessions)},
                     "Maximum sessions of {0} for this principal exceeded"));
         }
 
@@ -177,7 +172,7 @@ public class MySessionAuthenticationStrategy implements SessionAuthenticationStr
      * unlimited sessions.
      *
      * @param maximumSessions the maximimum number of permitted sessions a user can have
-     * open simultaneously.
+     *                        open simultaneously.
      */
     public void setMaximumSessions(int maximumSessions) {
         Assert.isTrue(

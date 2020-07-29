@@ -1,14 +1,11 @@
-package com.zjc.security.web.utils;
+package com.zjc.security.web.lock;
 
-import org.apache.poi.ss.formula.functions.T;
-import org.elasticsearch.common.recycler.Recycler;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -541,7 +538,7 @@ public final class RedisUtil {
      * @param key   键
      * @param value 值
      * @param time  时间(秒)
-     * @return
+     * @return boolean
      */
     public boolean lSet(String key, List<Object> value, long time) {
         try {

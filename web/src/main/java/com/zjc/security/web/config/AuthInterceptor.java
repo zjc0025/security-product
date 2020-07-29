@@ -36,9 +36,9 @@ public class AuthInterceptor extends HandlerInterceptorAdapter {
         //获取当前会话的session信息
         SessionRegistry sessionRegistry = mySessionAuthenticationStrategy.getSessionRegistry();
         SessionInformation sessionInformation = sessionRegistry.getSessionInformation(request.getSession().getId());
-        if(sessionInformation.isExpired()){
+        if (sessionInformation.isExpired()) {
             sessionRegistry.removeSessionInformation(sessionInformation.getSessionId());
-            response.sendRedirect(defaultFailureUrl + "?msg="+ URLEncoder.encode("登录过期！","utf-8"));
+            response.sendRedirect(defaultFailureUrl + "?msg=" + URLEncoder.encode("登录过期！", "utf-8"));
             return false;
         }
         return true;

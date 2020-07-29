@@ -43,7 +43,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
         http
                 .authorizeRequests()
-                .antMatchers( "/es/**","/register","/loginFail","/home","/css/**","/img/**","/js/**","/scss/**","/vendor/**","/**/*.png","/**/*.jpg").permitAll()
+                .antMatchers("/es/**", "/register", "/loginFail", "/home", "/css/**", "/img/**", "/js/**", "/scss/**", "/vendor/**", "/**/*.png", "/**/*.jpg").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .formLogin()
@@ -87,7 +87,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     /**
      * 持久化token
-     *
+     * <p>
      * Security中，默认是使用PersistentTokenRepository的子类InMemoryTokenRepositoryImpl，将token放在内存中
      * 如果使用JdbcTokenRepositoryImpl，会创建表persistent_logins，将token持久化到数据库
      */
@@ -99,9 +99,5 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         return tokenRepository;
     }
 
-    public static void main(String[] args) {
-        System.out.println(new BCryptPasswordEncoder().encode("111") );
-
-    }
 
 }

@@ -103,10 +103,11 @@ public class MultiReadHttpServletRequest extends HttpServletRequestWrapper {
 
     /**
      * 将前端请求的表单数据转换成json字符串 - 前后端一体的情况下使用
+     *
      * @param request:
      * @return: java.lang.String
      */
-    public String getBodyJsonStrByForm(ServletRequest request){
+    public String getBodyJsonStrByForm(ServletRequest request) {
         Map<String, Object> bodyMap = new HashMap<>(16);
         try {
             // 参数定义
@@ -117,8 +118,8 @@ public class MultiReadHttpServletRequest extends HttpServletRequestWrapper {
                 paraName = e.nextElement();
                 bodyMap.put(paraName, request.getParameter(paraName));
             }
-        } catch(Exception e) {
-            log.error("请求参数转换错误!",e);
+        } catch (Exception e) {
+            log.error("请求参数转换错误!", e);
         }
         // json对象转json字符串 转javabean
 //        SecurityUser user = JSONObject.parseObject(JSONObject.toJSONString(bodyMap), SecurityUser.class);
@@ -128,10 +129,11 @@ public class MultiReadHttpServletRequest extends HttpServletRequestWrapper {
 
     /**
      * 将前端传递的json数据转换成json字符串 - 前后端分离的情况下使用
+     *
      * @param request:
      * @return: java.lang.String
      */
-    public String getBodyJsonStrByJson(ServletRequest request){
+    public String getBodyJsonStrByJson(ServletRequest request) {
 //        StringBuilder requestStrBuilder = new StringBuilder();
 //        try {
 //            BufferedReader streamReader = new MultiReadHttpServletRequest(request).getReader();
@@ -149,12 +151,11 @@ public class MultiReadHttpServletRequest extends HttpServletRequestWrapper {
         String line = null;
         try {
             BufferedReader reader = request.getReader();
-            while((line = reader.readLine()) != null) {
+            while ((line = reader.readLine()) != null) {
                 json.append(line);
             }
-        }
-        catch(Exception e) {
-            log.error("请求参数转换错误!",e);
+        } catch (Exception e) {
+            log.error("请求参数转换错误!", e);
         }
         return json.toString();
     }

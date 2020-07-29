@@ -21,11 +21,11 @@ import java.net.URLDecoder;
 public class HomeController {
 
     @GetMapping("/home/index")
-    public String index(Model model, Authentication authentication){
+    public String index(Model model, Authentication authentication) {
         SecurityUser securityUser = (SecurityUser) authentication.getPrincipal();
         SysUser sysUser = securityUser.getCurrentUserInfo();
         sysUser.setPassword("");
-        model.addAttribute("user",sysUser);
+        model.addAttribute("user", sysUser);
         return "home/index";
     }
 
@@ -36,14 +36,14 @@ public class HomeController {
 
     @GetMapping("/loginFail")
     public String loginFail(String msg, Model model) throws UnsupportedEncodingException {
-        if(!StringUtils.isEmpty(msg)){
-            model.addAttribute("errorMsg", URLDecoder.decode(msg,"utf-8"));
+        if (!StringUtils.isEmpty(msg)) {
+            model.addAttribute("errorMsg", URLDecoder.decode(msg, "utf-8"));
         }
         return "login";
     }
 
     @GetMapping("/home/dashboard")
-    public String dashboard(){
+    public String dashboard() {
         return "home/dashboard";
     }
 

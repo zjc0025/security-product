@@ -3,7 +3,6 @@ package com.zjc.security.web.controller;
 import com.zjc.security.web.service.EsSearchService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -19,12 +18,12 @@ public class EsSearchController {
     EsSearchService esSearchService;
 
     @GetMapping("/es/searchRequest")
-    public String searchRequest(String indexName){
+    public String searchRequest(String indexName) {
         return esSearchService.searchRequest(indexName);
     }
 
     @GetMapping("/es/searchHighLightRequest")
-    public String searchHighLightRequest(String indexName){
+    public String searchHighLightRequest(String indexName) {
         return esSearchService.searchHighLightRequest(indexName);
     }
 
