@@ -5,4 +5,5 @@ include 'service'
 include 'authorization-server'
 include 'resource-server'
 include 'client'
+include 'social'
 

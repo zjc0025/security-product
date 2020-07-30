@@ -1,0 +1,42 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot'
+}
+
+apply plugin: 'io.spring.dependency-management'  //应用的插件
+
+group 'com.zjc'
+version '1.0-SNAPSHOT'
+
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+}
+
+bootJar {
+    baseName('social-web')
+    version('0.1.0')
+}
+
+dependencies {
+
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+    compile 'org.springframework.boot:spring-boot-starter-web'
+    compile 'org.springframework.boot:spring-boot-starter-test'
+    compile 'org.springframework.boot:spring-boot-devtools'
+    compile 'org.springframework.boot:spring-boot-starter-thymeleaf'
+    compile 'org.projectlombok:lombok'
+    compile 'com.alibaba:fastjson:1.2.56'
+    compile 'com.alibaba:easyexcel:2.2.3'
+
+    compile 'org.springframework.boot:spring-boot-starter-data-redis'
+    compile 'org.redisson:redisson-spring-boot-starter:3.10.6'
+
+    annotationProcessor 'org.projectlombok:lombok'
+}
+
+bootRun {
+    jvmArgs "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005"
+    sourceResources sourceSets.main
+}
