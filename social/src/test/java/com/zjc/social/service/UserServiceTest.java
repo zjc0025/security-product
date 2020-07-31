@@ -54,7 +54,7 @@ public class UserServiceTest {
     @Test
     public void testPostStatus() {
 //        long statusId = userService.postStatus(1,"你好o", null);
-        long statusId = userService.postStatus(1, "2你好o", null);
+        long statusId = userService.postStatus(1, "663你好o", null);
         System.out.println(statusId);
     }
 

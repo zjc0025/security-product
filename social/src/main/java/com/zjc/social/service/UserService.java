@@ -128,7 +128,7 @@ public class UserService {
             data = new HashMap<>();
         }
         data.put("message", message);
-        data.put("posted", String.valueOf(System.currentTimeMillis()));
+        data.put("posted", System.currentTimeMillis());
         data.put("id", String.valueOf(id));
         data.put("uid", String.valueOf(userId));
         data.put("login", login);
@@ -169,7 +169,12 @@ public class UserService {
         if (null != msg) {
             //循环消息id获取消息具体内容
 //            msg.forEach(x -> msgList.add((String) redisTemplate.opsForHash().get("status:" + x, "message")));
-            msg.forEach(x -> msgList.add(redisTemplate.opsForHash().entries("status:" + x)));
+//            msg.forEach(x -> msgList.add(redisTemplate.opsForHash().entries("status:" + x)));
+            for(Object obj : msg){
+                if(!redisTemplate.opsForHash().entries("status:" + obj).isEmpty()){
+                    msgList.add(redisTemplate.opsForHash().entries("status:" + obj));
+                }
+            }
         }
         return msgList;
     }
@@ -262,14 +267,14 @@ public class UserService {
         if (id < 0) {
             return -1;
         }
-        String time = (String) redisTemplate.opsForHash().get("status:" + id, "posted");
-        if (null == time) {
-            return -1;
-        }
+        long time = (long) redisTemplate.opsForHash().get("status:" + id, "posted");
+//        if (null == time) {
+//            return -1;
+//        }
         //更新本人时间轴
-        redisTemplate.opsForZSet().add("profile:" + userId, id, Double.parseDouble(time));
+        redisTemplate.opsForZSet().add("profile:" + userId, id, time);
         //更新关注者主页时间轴
-        syndicateStatus(userId, id, Double.parseDouble(time), 0);
+        syndicateStatus(userId, id, time, 0);
         return id;
     }
 
