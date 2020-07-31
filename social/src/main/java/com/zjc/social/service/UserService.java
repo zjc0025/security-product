@@ -5,11 +5,16 @@ import com.zjc.social.utils.RedisUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RLock;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
+import org.springframework.data.redis.core.RedisOperations;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.SessionCallback;
 import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * @ClassName UserService
@@ -20,6 +25,10 @@ import java.util.*;
 @Slf4j
 @Service
 public class UserService {
+
+    private static final long POSTS_PER_PASS = 1000;
+
+    private static final long HOME_TIMELINE_SIZE = 100;
 
     @Autowired
     RedisUtil redisUtil;
@@ -46,21 +55,31 @@ public class UserService {
         //生成用户id
         long id = redisUtil.incr("user:id:", 1);
 
-        redisTemplate.multi();
-        //将该帐号与id绑定放入hash
-        redisUtil.hset("users:", llogin, String.valueOf(id));
-        //初始化用户信息
-        Map<String, String> values = new HashMap<>();
-        values.put("login", login);
-        values.put("id", String.valueOf(id));
-        values.put("name", name);
-        values.put("followers", "0");
-        values.put("following", "0");
-        values.put("posts", "0");
-        values.put("signup", String.valueOf(System.currentTimeMillis()));
 
-        redisTemplate.opsForHash().putAll("user:" + id, values);
-        redisTemplate.exec();
+        redisTemplate.execute(new SessionCallback<Object>() {
+
+            @Override
+            public <K, V> Object execute(RedisOperations<K, V> operations) throws DataAccessException {
+                //开启事务
+                operations.multi();
+                //将该帐号与id绑定放入hash
+                redisUtil.hset("users:", llogin, String.valueOf(id));
+                //初始化用户信息
+                Map<String, Object> values = new HashMap<>();
+                values.put("login", login);
+                values.put("id", String.valueOf(id));
+                values.put("name", name);
+                values.put("followers", 0);
+                values.put("following", 0);
+                values.put("posts", 0);
+                values.put("signup", String.valueOf(System.currentTimeMillis()));
+
+                redisTemplate.opsForHash().putAll("user:" + id, values);
+                //执行事务
+                operations.exec();
+                return null;
+            }
+        });
 
         RedisLockUtil.unlock(lock);
         return id;
@@ -74,19 +93,31 @@ public class UserService {
      * @Description 创建用户状态
      * @Date 2020/7/30 14:30
      **/
-    public long createStatus(long userId, String message, Map<String, String> data) {
-        redisTemplate.multi();
+    public long createStatus(long userId, String message, Map<String, Object> data) {
 
-        //根据用户id获取账号名
-        redisTemplate.opsForHash().get("user:" + userId, "login");
-        //获取新的状态id
-        redisTemplate.opsForValue().increment("status:id:", 1);
+        final List[] response = new List[]{new ArrayList<>()};
 
-        List<Object> response = redisTemplate.exec();
+        redisTemplate.execute(new SessionCallback<Object>() {
+
+            @Override
+            public <K, V> Object execute(RedisOperations<K, V> operations) throws DataAccessException {
+                //开启事务
+                operations.multi();
+                //根据用户id获取账号名
+                redisTemplate.opsForHash().get("user:" + userId, "login");
+                //获取新的状态id
+                redisTemplate.opsForValue().increment("status:id:", 1);
+                //执行事务
+                response[0] = operations.exec();
+                return null;
+            }
+        });
+
+
         //获取帐号名
-        String login = (String) response.get(0);
+        String login = (String) response[0].get(0);
         //获取用户id
-        long id = (Long) response.get(1);
+        long id = (Long) response[0].get(1);
         //用户帐号不存在，则失败
         if (login == null) {
             return -1;
@@ -102,14 +133,24 @@ public class UserService {
         data.put("uid", String.valueOf(userId));
         data.put("login", login);
 
-        redisTemplate.multi();
 
-        //使用hash保存状态id和信息内容
-        redisTemplate.opsForHash().putAll("status:" + id, data);
-        //用户表的发送信息数量加1
-        redisTemplate.opsForHash().increment("user:" + userId, "posts", 1);
+        Map<String, Object> finalData = data;
+        redisTemplate.execute(new SessionCallback<Object>() {
 
-        redisTemplate.exec();
+            @Override
+            public <K, V> Object execute(RedisOperations<K, V> operations) throws DataAccessException {
+                //开启事务
+                operations.multi();
+                //使用hash保存状态id和信息内容
+                redisTemplate.opsForHash().putAll("status:" + id, finalData);
+                //用户表的发送信息数量加1
+                redisTemplate.opsForHash().increment("user:" + userId, "posts", 1);
+                //执行事务
+                operations.exec();
+                return null;
+            }
+        });
+
         return id;
     }
 
@@ -172,11 +213,11 @@ public class UserService {
 
 
     /**
+     * @param userId, otherUserId
+     * @return void
      * @author ZJC
      * @Description 取消关注
      * @Date 2020/7/30 16:17
-     * @param userId, otherUserId
-     * @return void
      **/
     public void unFollowUser(String userId, String otherUserId) {
         //正在关注
@@ -198,12 +239,114 @@ public class UserService {
         redisTemplate.opsForHash().increment("user:" + userId, "following", -1);
         redisTemplate.opsForHash().increment("user:" + otherUserId, "followers", -1);
         //删除被取消关注用户的100条动态
-        if(null != msg && msg.size() > 0){
-            for(ZSetOperations.TypedTuple tmp : msg){
+        if (null != msg && msg.size() > 0) {
+            for (ZSetOperations.TypedTuple tmp : msg) {
                 redisTemplate.opsForZSet().remove("home:" + userId, tmp.getValue());
             }
         }
 
+    }
+
+    /**
+     * @param userId, message, data
+     * @return void
+     * @author ZJC
+     * @Description 更新个人时间轴
+     * @Date 2020/7/31 8:03
+     **/
+    public long postStatus(long userId, String message, Map<String, Object> data) {
+        long id = createStatus(userId, message, data);
+        if (id < 0) {
+            return -1;
+        }
+        String time = (String) redisTemplate.opsForHash().get("status:" + id, "posted");
+        if (null == time) {
+            return -1;
+        }
+        //更新本人时间轴
+        redisTemplate.opsForZSet().add("profile:" + userId, id, Double.parseDouble(time));
+        //更新关注者主页时间轴
+        syndicateStatus(userId, id, Double.parseDouble(time), 0);
+        return id;
+    }
+
+    /**
+     * @param userId, posted, start
+     * @return void
+     * @author ZJC
+     * @Description 更新关注者主页时间轴
+     * @Date 2020/7/31 8:14
+     **/
+    public void syndicateStatus(long userId, long postId, double postTime, double start) {
+        //获取1000个关注者
+        Set<ZSetOperations.TypedTuple<Object>> followers = redisTemplate.opsForZSet().rangeByScoreWithScores(
+                "followers:" + userId,
+                start, Double.MAX_VALUE,
+                0, POSTS_PER_PASS);
+
+
+        start = (double) redisTemplate.execute(new SessionCallback<Object>() {
+
+            @Override
+            public <K, V> Object execute(RedisOperations<K, V> operations) throws DataAccessException {
+                double index = 0;
+                //开启事务
+                operations.multi();
+                for (ZSetOperations.TypedTuple tuple : followers) {
+                    String follower = (String) tuple.getValue();
+                    index = tuple.getScore();
+                    redisTemplate.opsForZSet().add("home:" + follower, String.valueOf(postId), postTime);
+                    redisTemplate.opsForZSet().range("home:" + follower, 0, -1);
+                    redisTemplate.opsForZSet().removeRange(
+                            "home:" + follower, 0, 0 - HOME_TIMELINE_SIZE - 1);
+                }
+                //执行事务
+                operations.exec();
+                return index;
+            }
+        });
+
+
+        //如果关注者大于1000，则启动线程后台更新关注者的时间轴
+        if (followers.size() >= POSTS_PER_PASS) {
+            try {
+                ExecutorService executor = Executors.newFixedThreadPool(10);
+                double finalStart = start;
+                executor.submit(() -> {
+                    syndicateStatus(userId, postId, postTime, finalStart);
+                });
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+
+    public boolean deleteStatus(long uid, long statusId) {
+        String key = "status:" + statusId;
+        RedisLockUtil.lock(key);
+
+        try {
+            //如果该消息的发布人不是uid，删除失败
+            if (!String.valueOf(uid).equals(redisTemplate.opsForHash().get(key, "uid"))) {
+                return false;
+            }
+
+            redisTemplate.multi();
+            //删除该消息
+            redisTemplate.delete(key);
+            //删除该用户个人时间轴中此消息的id
+            redisTemplate.opsForZSet().remove("profile:" + uid, String.valueOf(statusId));
+            //删除该用户主页时间轴中此消息的id
+            redisTemplate.opsForZSet().remove("home:" + uid, String.valueOf(statusId));
+            //该用户发布消息数-1
+            redisTemplate.opsForHash().increment("user:" + uid, "posts", -1);
+            redisTemplate.exec();
+
+            return true;
+        } finally {
+            RedisLockUtil.unlock(key);
+        }
     }
 
 }

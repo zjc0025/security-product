@@ -11,7 +11,6 @@ import java.util.concurrent.TimeUnit;
  * @Author ZJC
  * @Date 2020/7/29 10:57
  */
-@Component
 public class RedisLockUtil {
 
     private static DistributedLocker distributedLocker = SpringContextHolder.getBean(DistributedLocker.class);
