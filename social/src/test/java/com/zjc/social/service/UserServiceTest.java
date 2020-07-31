@@ -7,8 +7,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -28,15 +28,15 @@ public class UserServiceTest {
     public void testCreateUser() throws InterruptedException {
         CountDownLatch countDownLatch = new CountDownLatch(1);
         ExecutorService executor = Executors.newFixedThreadPool(10);
-        for (int i=0; i<10; i++){
+        for (int i = 0; i < 10; i++) {
             executor.submit(() -> {
                 try {
                     countDownLatch.await();
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-                long userId = userService.createUser("zjc", "测试");
-                System.out.println("创建用户id为：" + userId + "用户帐号为：" + "zjc");
+                long userId = userService.createUser("zjc2", "测试");
+                System.out.println("创建用户id为：" + userId);
                 countDownLatch.countDown();
             });
         }
@@ -47,20 +47,37 @@ public class UserServiceTest {
 
     @Test
     public void testCreateStatus() {
-        long statusId = userService.createStatus(1,"你好", null);
+        long statusId = userService.createStatus(1, "你好", null);
         System.out.println(statusId);
     }
 
     @Test
     public void testPostStatus() {
-        long statusId = userService.postStatus(1,"你好啊", null);
+//        long statusId = userService.postStatus(1,"你好o", null);
+        long statusId = userService.postStatus(1, "2你好o", null);
         System.out.println(statusId);
     }
 
     @Test
     public void testGetTimeline() {
-        List<String> timeline = userService.getTimeline("1","home:1", 0,100);
+//        List<Map> timeline = userService.getTimeline("2","home:", 0,100);
+        List<Map> timeline = userService.getTimeline("1", "profile:", 0, 100);
         System.out.println(timeline);
+    }
+
+    @Test
+    public void testFollowUser() {
+        userService.followUser("2", "1");
+    }
+
+    @Test
+    public void testUnFollowUser() {
+        userService.unFollowUser("2", "1");
+    }
+
+    @Test
+    public void testDeleteStatus() {
+        System.out.println(userService.deleteStatus(1, 2));
     }
 
 }

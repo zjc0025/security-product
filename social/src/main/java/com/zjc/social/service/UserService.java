@@ -161,13 +161,15 @@ public class UserService {
      * @Description 根据用户id、时间轴名称、页数、每页条数,获取时间轴消息
      * @Date 2020/7/30 15:25
      **/
-    public List<String> getTimeline(String userId, String timeline, int pageIndex, int pageSize) {
+    public List<Map> getTimeline(String userId, String timeline, int pageIndex, int pageSize) {
         //时间倒序获取分页消息id
         Set<Object> msg = redisTemplate.opsForZSet().reverseRange(timeline + userId, (pageIndex - 1) * pageSize, pageIndex * pageSize - 1);
-        List<String> msgList = new ArrayList<>();
+//        List<String> msgList = new ArrayList<>();
+        List<Map> msgList = new ArrayList<>();
         if (null != msg) {
             //循环消息id获取消息具体内容
-            msg.forEach(x -> msgList.add((String) redisTemplate.opsForHash().get("status:" + x, "message")));
+//            msg.forEach(x -> msgList.add((String) redisTemplate.opsForHash().get("status:" + x, "message")));
+            msg.forEach(x -> msgList.add(redisTemplate.opsForHash().entries("status:" + x)));
         }
         return msgList;
     }
@@ -205,9 +207,10 @@ public class UserService {
         if (null != msg && msg.size() > 0) {
             redisTemplate.opsForZSet().add("home:" + userId, msg);
         }
-        long end = Optional.ofNullable(redisTemplate.opsForZSet().zCard("home:" + userId)).orElse(0L);
-        long start = end - 100;
-        redisTemplate.opsForZSet().removeRange("home:" + userId, start, end);
+        long homeSize = Optional.ofNullable(redisTemplate.opsForZSet().zCard("home:" + userId)).orElse(0L);
+        if (homeSize > 100) {
+            redisTemplate.opsForZSet().removeRange("home:" + userId, 0, homeSize - 100);
+        }
 
     }
 
@@ -225,7 +228,7 @@ public class UserService {
         //关注者
         String fkey2 = "followers:" + otherUserId;
         //判断是否已经取消关注
-        if (redisTemplate.opsForZSet().score(fkey1, otherUserId) != null) {
+        if (redisTemplate.opsForZSet().score(fkey1, otherUserId) == null) {
             log.info("{} 未关注 {}", userId, otherUserId);
             return;
         }
@@ -295,7 +298,7 @@ public class UserService {
                 for (ZSetOperations.TypedTuple tuple : followers) {
                     String follower = (String) tuple.getValue();
                     index = tuple.getScore();
-                    redisTemplate.opsForZSet().add("home:" + follower, String.valueOf(postId), postTime);
+                    redisTemplate.opsForZSet().add("home:" + follower, postId, postTime);
                     redisTemplate.opsForZSet().range("home:" + follower, 0, -1);
                     redisTemplate.opsForZSet().removeRange(
                             "home:" + follower, 0, 0 - HOME_TIMELINE_SIZE - 1);
@@ -324,7 +327,8 @@ public class UserService {
 
     public boolean deleteStatus(long uid, long statusId) {
         String key = "status:" + statusId;
-        RedisLockUtil.lock(key);
+        String lockKey = key + UUID.randomUUID();
+        RedisLockUtil.lock(lockKey);
 
         try {
             //如果该消息的发布人不是uid，删除失败
@@ -332,20 +336,29 @@ public class UserService {
                 return false;
             }
 
-            redisTemplate.multi();
-            //删除该消息
-            redisTemplate.delete(key);
-            //删除该用户个人时间轴中此消息的id
-            redisTemplate.opsForZSet().remove("profile:" + uid, String.valueOf(statusId));
-            //删除该用户主页时间轴中此消息的id
-            redisTemplate.opsForZSet().remove("home:" + uid, String.valueOf(statusId));
-            //该用户发布消息数-1
-            redisTemplate.opsForHash().increment("user:" + uid, "posts", -1);
-            redisTemplate.exec();
+            redisTemplate.execute(new SessionCallback<Object>() {
+
+                @Override
+                public <K, V> Object execute(RedisOperations<K, V> operations) throws DataAccessException {
+                    //开启事务
+                    operations.multi();
+                    //删除该消息
+                    redisTemplate.delete(key);
+                    //删除该用户个人时间轴中此消息的id
+                    redisTemplate.opsForZSet().remove("profile:" + uid, statusId);
+                    //删除该用户主页时间轴中此消息的id
+                    redisTemplate.opsForZSet().remove("home:" + uid, statusId);
+                    //该用户发布消息数-1
+                    redisTemplate.opsForHash().increment("user:" + uid, "posts", -1);
+                    //执行事务
+                    operations.exec();
+                    return null;
+                }
+            });
 
             return true;
         } finally {
-            RedisLockUtil.unlock(key);
+            RedisLockUtil.unlock(lockKey);
         }
     }
 
